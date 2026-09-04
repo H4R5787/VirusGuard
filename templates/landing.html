@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}VirusGuard — Scan, Learn, Stay Safe{% endblock %}
+
+{% block content %}
+<section class="container" style="padding-top: 4rem; padding-bottom: 3rem;">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold mb-3">
+                Know what's in your files <span style="color: var(--accent-primary);">before</span> it's a problem.
+            </h1>
+            <p class="text-secondary fs-5 mb-4">
+                Upload a file, we check it against VirusTotal, and if something's wrong you get
+                a plain-English explanation — not just a red icon.
+            </p>
+            {% if session.get('name') %}
+            <a href="/scan" class="btn btn-primary btn-lg">Go to Scan</a>
+            {% else %}
+            <a href="/Register" class="btn btn-primary btn-lg">Get Started</a>
+            {% endif %}
+        </div>
+        <div class="col-lg-5 text-center d-none d-lg-block">
+            <i class="fa-solid fa-shield-halved" style="font-size: 10rem; color: var(--accent-primary); opacity: 0.85;" aria-hidden="true"></i>
+        </div>
+    </div>
+</section>
+
+<section class="container" style="padding-bottom: 4rem;">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-magnifying-glass-chart fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h5">Scan</h3>
+                <p class="text-secondary mb-0">Drag and drop a file and get a VirusTotal-backed verdict in seconds.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-graduation-cap fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h5">Learn</h3>
+                <p class="text-secondary mb-0">Browse a library of common malware and attack types, explained simply.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-bell fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h5">Alerts</h3>
+                <p class="text-secondary mb-0">If a threat is found, you get an AI-generated explanation and an email alert.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

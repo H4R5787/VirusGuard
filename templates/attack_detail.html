@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ attack.title }} · Attack Library · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 860px; padding-top: 2rem; padding-bottom: 4rem;">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Attacks">Attack Library</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ attack.title }}</li>
+        </ol>
+    </nav>
+
+    <img src="{{ attack.hero_img }}" alt="{{ attack.title }} illustration" class="attack-hero-img mb-4">
+
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+        <h1 class="h3 mb-0">{{ attack.long_title }}</h1>
+        {% if attack.external_link %}
+        <a href="{{ attack.external_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light text-nowrap">
+            Try an interactive lesson <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
+        </a>
+        {% endif %}
+    </div>
+
+    <p class="text-secondary fs-5 mb-4">{{ attack.intro }}</p>
+
+    <div class="accordion mb-5" id="attackAccordion">
+        {% for section in attack.sections %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button {{ '' if loop.first else 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#attackSection{{ loop.index }}">
+                    {{ section.heading }}
+                </button>
+            </h2>
+            <div id="attackSection{{ loop.index }}" class="accordion-collapse collapse {{ 'show' if loop.first }}" data-bs-parent="#attackAccordion">
+                <div class="accordion-body">{{ section.body }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="app-card text-center mb-5">
+        <h2 class="h5 mb-2">Think a file might be affected?</h2>
+        <p class="text-secondary mb-3">Scan it with VirusGuard and get a plain-English explanation of anything we find.</p>
+        <a href="{{ '/scan' if session.get('name') else '/Register' }}" class="btn btn-primary">Scan a file</a>
+    </div>
+
+    {% if related %}
+    <h2 class="h5 mb-3">Related attacks</h2>
+    <div class="row g-4">
+        {% for r in related %}
+        <div class="col-md-4">
+            <div class="app-card h-100 d-flex flex-column">
+                <img src="{{ url_for('static', filename='Attacks/Card/' ~ r.card_img) }}" alt="{{ r.title }} illustration">
+                <h3 class="h6 mt-3 mb-2">{{ r.title }}</h3>
+                <p class="text-secondary small flex-grow-1">{{ r.desc }}</p>
+                <a href="/attacks/{{ r.slug }}" class="btn btn-outline-light btn-sm mt-2">Learn More</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

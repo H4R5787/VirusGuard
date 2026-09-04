@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Scan a File · VirusGuard{% endblock %}
+
+{% block content %}
+{#
+    Explanation categories are flashed by app.py under these exact category
+    names (see explain_virus_info()/upload_file()). We map them here to the
+    accordion labels from the redesign plan, instead of printing the raw
+    category string to the user like the old page did.
+#}
+{% set category_labels = {
+    "Explain Virus": "What is this threat?",
+    "Explain the History of the Virus": "History",
+    "Explain how the Virus works": "How it works",
+    "Explain how to prevent the Virus": "How to prevent it"
+} %}
+{% set explanation_items = all_flashes | selectattr("0", "in", category_labels.keys() | list) | list %}
+
+<div class="container" style="max-width: 720px; padding-top: 2.5rem; padding-bottom: 4rem;">
+
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Scan a file</h1>
+        <p class="text-secondary mb-0">Upload a file to check it against VirusTotal. This can take a few seconds.</p>
+    </div>
+
+    <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" id="scanForm">
+        <div class="drag-drop-area" id="drag-drop-area" role="button" tabindex="0" aria-label="Choose or drop a file to scan">
+            <i class="fa-solid fa-cloud-arrow-up fa-2x mb-2" aria-hidden="true"></i>
+            <p class="mb-1" id="dropInstruction">Drag and drop your file here, or click to select</p>
+            <p class="text-secondary small mb-0" id="file-chosen">No file chosen</p>
+            <input type="file" id="file" name="file" class="visually-hidden" required>
+        </div>
+
+        <div class="progress mt-3 d-none" id="uploadProgress" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+        </div>
+        <p class="text-secondary small mt-2 d-none" id="scanningLabel">
+            <i class="fa-solid fa-spinner fa-spin me-1"></i> Scanning with VirusTotal — this can take up to a minute…
+        </p>
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary flex-grow-1" id="submitBtn">Upload and Scan</button>
+            <button type="button" class="btn btn-outline-light" id="cancelBtn">Cancel</button>
+        </div>
+    </form>
+
+    {% if scan_result %}
+    <div class="result-panel result-{{ scan_result }}">
+        <div class="result-status">
+            {% if scan_result == 'clean' %}
+                <i class="fa-solid fa-circle-check"></i> Clean{% if filename %} — {{ filename }}{% endif %}
+            {% else %}
+                <i class="fa-solid fa-triangle-exclamation"></i> Threat Detected{% if filename %} — {{ filename }}{% endif %}
+            {% endif %}
+        </div>
+
+        {% if scan_result == 'virus' and explanation_items %}
+        <div class="accordion mt-3" id="resultAccordion">
+            {% for category, message in explanation_items %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button {{ '' if loop.first else 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                        {{ category_labels.get(category, category) }}
+                    </button>
+                </h2>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {{ 'show' if loop.first }}" data-bs-parent="#resultAccordion">
+                    <div class="accordion-body">{{ message }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const fileInput = document.getElementById('file');
+    const fileChosenLabel = document.getElementById('file-chosen');
+    const dragDropArea = document.getElementById('drag-drop-area');
+    const scanForm = document.getElementById('scanForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const scanningLabel = document.getElementById('scanningLabel');
+
+    function setChosenFile(name) {
+        fileChosenLabel.textContent = name || 'No file chosen';
+        dragDropArea.classList.toggle('has-file', !!name);
+    }
+
+    fileInput.addEventListener('change', function () {
+        setChosenFile(fileInput.files.length ? fileInput.files[0].name : null);
+    });
+
+    dragDropArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dragDropArea.classList.add('dragover');
+    });
+    dragDropArea.addEventListener('dragleave', function () {
+        dragDropArea.classList.remove('dragover');
+    });
+    dragDropArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dragDropArea.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            setChosenFile(e.dataTransfer.files[0].name);
+        }
+    });
+    dragDropArea.addEventListener('click', function () { fileInput.click(); });
+    dragDropArea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+    });
+
+    // Real "uploading" state: disable the form and show a progress indicator
+    // for the VirusTotal round trip, instead of giving no feedback at all.
+    scanForm.addEventListener('submit', function () {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Scanning…';
+        cancelBtn.disabled = true;
+        uploadProgress.classList.remove('d-none');
+        scanningLabel.classList.remove('d-none');
+    });
+
+    // Was previously a bare <button> inside the form with no type, which
+    // defaulted to type="submit" — clicking "Cancel" actually re-submitted
+    // the form. Now explicitly type="button" and just clears the selection.
+    cancelBtn.addEventListener('click', function () {
+        fileInput.value = '';
+        setChosenFile(null);
+    });
+</script>
+{% endblock %}

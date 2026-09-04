@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Create an Account · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <h2 class="mb-1">Create an account</h2>
+        <p class="text-secondary mb-4">Scan files and get plain-English threat explanations.</p>
+
+        <form action="/Register" method="POST" novalidate>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                    <button class="btn btn-outline-light" type="button" id="togglePassword" aria-label="Show password">
+                        <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                    </button>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <small class="text-secondary" id="strengthLabel">At least 8 characters</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Create account</button>
+            <p class="text-center small text-secondary mb-0">
+                Already have an account? <a href="/login">Sign in</a>
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    toggleBtn.addEventListener('click', function () {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+        toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthLabel = document.getElementById('strengthLabel');
+    const strengthMeta = [
+        { color: '#ff5c5c', label: 'Weak' },
+        { color: '#ffb020', label: 'Fair' },
+        { color: '#4f8cff', label: 'Good' },
+        { color: '#34c77b', label: 'Strong' },
+    ];
+
+    function scorePassword(value) {
+        let score = 0;
+        if (value.length >= 8) score++;
+        if (value.length >= 12) score++;
+        if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
+        if (/[0-9]/.test(value) && /[^A-Za-z0-9]/.test(value)) score++;
+        return Math.min(score, 4);
+    }
+
+    passwordInput.addEventListener('input', function () {
+        const score = scorePassword(passwordInput.value);
+        if (!passwordInput.value) {
+            strengthBar.style.width = '0%';
+            strengthLabel.textContent = 'At least 8 characters';
+            return;
+        }
+        const meta = strengthMeta[Math.max(score - 1, 0)];
+        strengthBar.style.width = (score / 4 * 100) + '%';
+        strengthBar.style.backgroundColor = meta.color;
+        strengthLabel.textContent = meta.label;
+    });
+</script>
+{% endblock %}

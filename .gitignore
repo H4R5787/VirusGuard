@@ -1,0 +1,20 @@
+# Secrets — never commit real values. Use .env.example as the template.
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Local uploads and databases (contain user-submitted files / user data)
+uploads/
+instance/
+*.db
+*.sqlite3
+
+# IDE
+.idea/
+
+# OS
+.DS_Store

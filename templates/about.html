@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}About Us · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <h1 class="h2">About VirusGuard</h1>
+    <p>Your reliable partner for file security and virus prevention.</p>
+</div>
+
+<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
+    <div class="mb-4">
+        <h2 class="h4 mb-3">Our History</h2>
+        <p class="text-secondary">
+            Founded in 2024, VirusGuard was created with the goal of providing users with
+            a platform that ensures the safety of their data from malicious threats. With
+            a dedicated team of cybersecurity professionals, we continue to innovate and
+            adapt to the ever-evolving cyber landscape.
+        </p>
+    </div>
+
+    <div class="mb-4">
+        <h2 class="h4 mb-3">Our Values</h2>
+        <p class="text-secondary mb-2">
+            We are committed to transparency, reliability, and excellence in everything we
+            do. Our values include:
+        </p>
+        <ul class="text-secondary">
+            <li>Trust and Integrity</li>
+            <li>Customer-Centric Approach</li>
+            <li>Innovation and Continuous Improvement</li>
+        </ul>
+    </div>
+
+    <div class="mb-5">
+        <h2 class="h4 mb-3">Our Vision</h2>
+        <p class="text-secondary">
+            To become the global leader in virus detection and prevention by offering
+            cutting-edge solutions and empowering individuals to take control of their
+            digital safety.
+        </p>
+    </div>
+
+    <div class="mb-5">
+        <h2 class="h4 mb-4 text-center">Meet Our Team</h2>
+        <div class="row g-4">
+            <div class="col-md-4 team-member text-center">
+                <img src="{{ url_for('static', filename='aboutUS/Founder_&_CEO_images.jpg') }}" alt="Harsh Vishwakarma">
+                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
+                <p class="text-secondary small">Founder &amp; CEO</p>
+            </div>
+            <div class="col-md-4 team-member text-center">
+                <img src="{{ url_for('static', filename='aboutUS/Chief_Security_Officer_images.jpg') }}" alt="Harsh Vishwakarma">
+                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
+                <p class="text-secondary small">Chief Security Officer</p>
+            </div>
+            <div class="col-md-4 team-member text-center">
+                <img src="{{ url_for('static', filename='aboutUS/Lead_Developer_images.jpg') }}" alt="Harsh Vishwakarma">
+                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
+                <p class="text-secondary small">Lead Developer</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="/ContactUs" class="btn btn-primary btn-lg">Learn More About Us</a>
+    </div>
+</div>
+{% endblock %}

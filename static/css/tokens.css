@@ -1,0 +1,51 @@
+/*
+ * Design tokens for the Virus Detection System.
+ *
+ * This is the single source of truth for color, replacing the ~5 different
+ * hardcoded color sets previously scattered across TEST.html, Login.html,
+ * index.html, and the attack-detail pages (#ffcf81, #007bff, #005AFF,
+ * #343a40, #1a1a1a, etc. all competing as "the" brand color).
+ *
+ * All contrast pairs here should be re-checked with a contrast checker
+ * before final sign-off (WCAG AA: 4.5:1 body text, 3:1 large text/UI).
+ */
+
+:root {
+  /* Surfaces */
+  --bg-primary: #0b0e14;      /* page background, near-black navy */
+  --bg-surface: #131822;      /* cards, nav, modals */
+  --bg-surface-alt: #1b2230;  /* nested surfaces, table stripes, hover */
+  --border-subtle: #2a3140;
+
+  /* Text */
+  --text-primary: #f5f7fa;
+  --text-secondary: #a6adbb;
+  --text-disabled: #5b6472;
+
+  /* Accent */
+  --accent-primary: #4f8cff;
+  --accent-primary-hover: #6fa1ff;
+  --accent-secondary: #7c5cff;
+
+  /* Status */
+  --success: #34c77b;
+  --danger: #ff5c5c;
+  --warning: #ffb020;
+  --info: #4f8cff;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+  /* Shape & spacing */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+
+  /* Type */
+  --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}

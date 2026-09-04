@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Admin · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-3">
+        <div>
+            <h1 class="h3 mb-1">Registered Users</h1>
+            <p class="text-secondary mb-0">
+                {{ pagination.total }} user{{ '' if pagination.total == 1 else 's' }}{{ ' matching “%s”' % search if search }}.
+            </p>
+        </div>
+        <form action="{{ url_for('admin') }}" method="GET" class="d-flex" style="max-width: 320px;">
+            <div class="input-group">
+                <span class="input-group-text" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-secondary);">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="search" name="q" class="form-control" placeholder="Search name or email…" value="{{ search }}">
+                {% if search %}
+                <a href="{{ url_for('admin') }}" class="btn btn-outline-light" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    {#
+        Note: the previous version of this page also referenced a `posts`
+        variable and shipped a "Create a New Post" form and a "Settings"
+        form, neither of which the backend ever wired up (no route handled
+        either submission, and `posts` was never passed to the template —
+        rendering this page would have raised a Jinja UndefinedError on
+        `posts|length`). Removed both rather than ship dead UI; add them
+        back once there's a real feature behind them.
+    #}
+
+    {% if users %}
+    <div class="table-responsive app-card">
+        <table class="table app-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.is_admin %}
+                        <span class="badge" style="background-color: var(--accent-secondary);">Admin</span>
+                        {% else %}
+                        <span class="text-secondary small">User</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="background-color: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle);">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title">Delete user?</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                This will permanently remove <strong>{{ user.name }}</strong> ({{ user.email }}). This can't be undone.
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" class="mb-0">
+                                    <button type="submit" class="btn btn-danger">Delete user</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <nav aria-label="User list pages" class="mt-4">
+        <ul class="pagination justify-content-center mb-0">
+            <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                <a class="page-link" href="{{ url_for('admin', page=pagination.prev_num, q=search) if pagination.has_prev else '#' }}" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">Previous</a>
+            </li>
+            {% for p in pagination.iter_pages() %}
+            <li class="page-item {{ 'active' if p == pagination.page }} {{ 'disabled' if not p }}">
+                {% if p %}
+                <a class="page-link" href="{{ url_for('admin', page=p, q=search) }}" style="background-color: {{ 'var(--accent-primary)' if p == pagination.page else 'var(--bg-surface-alt)' }}; border-color: var(--border-subtle); color: var(--text-primary);">{{ p }}</a>
+                {% else %}
+                <span class="page-link" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-disabled);">…</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                <a class="page-link" href="{{ url_for('admin', page=pagination.next_num, q=search) if pagination.has_next else '#' }}" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">Next</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="app-card text-center text-secondary py-5">
+        <i class="fa-solid fa-users-slash fa-2x mb-3"></i>
+        <p class="mb-0">{{ 'No users match “%s”.' % search if search else 'No users yet.' }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

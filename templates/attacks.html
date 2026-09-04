@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Attack Library · VirusGuard{% endblock %}
+
+{% block content %}
+{#
+    `attacks` is passed in from app.py's /Attacks route, sourced from
+    attack_data.ATTACKS — the single data source also used to render
+    attack_detail.html. This used to be a second, independently
+    hand-maintained copy of this exact list, hardcoded directly in this
+    template (and, before that, a *third* copy in a hardcoded JS array
+    that had no working links at all). One source now; the grid and the
+    detail pages can no longer drift out of sync with each other.
+#}
+
+<div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Attack Library</h1>
+        <p class="text-secondary mb-3">A quick reference for common malware and attack types.</p>
+        <div class="input-group" style="max-width: 420px;">
+            <span class="input-group-text" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-secondary);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="search" class="form-control" id="attackSearch" placeholder="Search attack types…"
+                   style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">
+        </div>
+    </div>
+
+    <div class="row g-4" id="attackGrid">
+        {% for attack in attacks %}
+        <div class="col-md-4 attack-card-col" data-name="{{ attack.title|lower }}">
+            <div class="app-card h-100 d-flex flex-column">
+                <img src="{{ url_for('static', filename='Attacks/Card/' ~ attack.card_img) }}" alt="{{ attack.title }} illustration">
+                <h3 class="h5 mt-3 mb-2">{{ attack.title }}</h3>
+                <p class="text-secondary small flex-grow-1">{{ attack.desc }}</p>
+                <a href="/attacks/{{ attack.slug }}" class="btn btn-outline-light mt-2">Learn More</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p class="text-secondary text-center mt-4 d-none" id="noResults">No attack types match your search.</p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const searchInput = document.getElementById('attackSearch');
+    const cards = document.querySelectorAll('.attack-card-col');
+    const noResults = document.getElementById('noResults');
+
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        cards.forEach(function (card) {
+            const match = card.dataset.name.includes(query);
+            card.classList.toggle('d-none', !match);
+            if (match) visibleCount++;
+        });
+        noResults.classList.toggle('d-none', visibleCount !== 0);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Security News · VirusGuard{% endblock %}
+
+{% block content %}
+{#
+    Previously 512 lines with the post content, chrome, and inline <style>
+    all duplicated together. The 5 posts below are the same content, now
+    data plus a single reusable .post-card component instead of 5 hand-built
+    copies of the same markup.
+#}
+{% set posts = [
+    {
+        "title": "Understanding CVE-2024-27348: A Wake-Up Call for Apache HugeGraph Users",
+        "author": "Zeyad Azima",
+        "date": "April 22, 2024",
+        "img": "CVE-2024-27348.jpg",
+        "text": "May brought alarming news for Apache HugeGraph-Server users with the discovery of CVE-2024-27348. This critical vulnerability allows unauthenticated users to execute OS commands remotely, putting your systems at risk. Affected versions are Apache HugeGraph-Server before 1.3.0; attackers can gain complete control of vulnerable systems through Groovy injection. Upgrade to version 1.3.0 or later to safeguard your systems against this serious threat."
+    },
+    {
+        "title": "Addressing the High-Severity CVE-2024-24919 in Check Point Security Gateways",
+        "author": "Security Desk",
+        "date": "May 28, 2024",
+        "img": "CVE-2024-24919.jpg",
+        "text": "Security professionals should take note of CVE-2024-24919, a high-severity information disclosure vulnerability affecting Check Point Security Gateways with IPSec VPN or Mobile Access blades, actively exploited since April. Unauthorized access to sensitive information could facilitate further network attacks. Update your gateway immediately to apply the security hotfix and implement multi-factor authentication."
+    },
+    {
+        "title": "GitLab Patches Critical XSS Vulnerability: CVE-2024-4835",
+        "author": "Vlad Constantinescu",
+        "date": "May 23, 2024",
+        "img": "CVE-2024-4835.jpg",
+        "text": "In May, GitLab released patches for CVE-2024-4835, a critical cross-site scripting vulnerability (CVSS score: 8.0) that could have let attackers steal user credentials through crafted malicious web pages. Upgrade to GitLab versions 17.0.1, 16.11.3, or 16.10.6 to mitigate this vulnerability."
+    },
+    {
+        "title": "Protecting Your QNAP NAS Devices from CVE-2024-27130",
+        "author": "Security Desk",
+        "date": "May 21, 2024",
+        "img": "CVE-2024-27130.jpg",
+        "text": "CVE-2024-27130 poses a serious threat to QNAP NAS devices running QTS: a critical Remote Code Execution vulnerability letting attackers access sensitive data and disrupt operations without needing login credentials. Update to QTS version 5.1.7.2770 or later to close this vulnerability."
+    },
+    {
+        "title": "Critical Authentication Bypass in GitHub Enterprise Server: CVE-2024-4985",
+        "author": "Security Desk",
+        "date": "May 20, 2024",
+        "img": "CVE-2024-4985.jpg",
+        "text": "GitHub Enterprise Server users need to address CVE-2024-4985, which allows attackers to bypass authentication completely on Enterprise Server versions prior to 3.13.0, granting unauthorized access to sensitive code repositories. Upgrade to the patched versions 3.9.15, 3.10.12, 3.11.10, or 3.12.4."
+    },
+] %}
+
+<div class="page-hero">
+    <h1 class="h2">Security News</h1>
+    <p>Recent vulnerability disclosures worth knowing about.</p>
+</div>
+
+<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
+    {% for post in posts %}
+    <div class="app-card post-card mb-4">
+        <div class="row g-4 align-items-start">
+            <div class="col-md-4">
+                <img src="{{ url_for('static', filename='Post/' ~ post.img) }}" alt="">
+            </div>
+            <div class="col-md-8">
+                <h2 class="h5 mb-1">{{ post.title }}</h2>
+                <p class="post-meta mb-2">By {{ post.author }} · {{ post.date }}</p>
+                <p class="text-secondary mb-0">{{ post.text }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

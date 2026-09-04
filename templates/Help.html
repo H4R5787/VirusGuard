@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Help Center · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <h1 class="h2">Help Center</h1>
+</div>
+
+<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
+
+    <div class="row g-4 text-center mb-5">
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-circle-question fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h6">FAQs</h3>
+                <p class="text-secondary small mb-0">Find answers to the most frequently asked questions.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-headset fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h6">Contact Support</h3>
+                <p class="text-secondary small mb-0">Need assistance? Get in touch with our support team.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100">
+                <i class="fa-solid fa-book fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
+                <h3 class="h6">Guides &amp; Tutorials</h3>
+                <p class="text-secondary small mb-0">Explore detailed guides to help you get started.</p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h4 mb-3">Frequently Asked Questions</h2>
+    <div class="accordion mb-5" id="faqAccordion">
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                    How do I reset my password?
+                </button>
+            </h3>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">You can reset your password by clicking "Forgot password" on the login page.</div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                    How do I upload files for virus scanning?
+                </button>
+            </h3>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">Log in, then go to the <a href="/scan">Scan</a> page and drag a file in, or click to choose one.</div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                    How do I contact support?
+                </button>
+            </h3>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">Use the form on the <a href="/ContactUs">Contact</a> page and we'll get back to you.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h4 mb-3">Guides &amp; Tutorials</h2>
+    <ul class="list-unstyled mb-5">
+        <li class="mb-2"><i class="fa-solid fa-arrow-right me-2" style="color: var(--accent-primary);" aria-hidden="true"></i>Getting Started with Virus Scanning</li>
+        <li class="mb-2"><i class="fa-solid fa-arrow-right me-2" style="color: var(--accent-primary);" aria-hidden="true"></i>Understanding Scan Results and Reports</li>
+        <li class="mb-2"><i class="fa-solid fa-arrow-right me-2" style="color: var(--accent-primary);" aria-hidden="true"></i>Best Practices for Securing Your Files</li>
+    </ul>
+
+    <div class="text-center">
+        <a href="/ContactUs" class="btn btn-primary">Need more information? Contact us</a>
+    </div>
+</div>
+{% endblock %}

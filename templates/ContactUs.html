@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Contact Us · VirusGuard{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <h1 class="h2">Contact Us</h1>
+</div>
+
+<div class="container" style="max-width: 960px; padding-bottom: 4rem;">
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h2 class="h4 mb-3">Contact Information</h2>
+            <p class="text-secondary"><strong class="text-primary">Address:</strong> 123 Business Street, Suite 100, City, Country</p>
+            <p class="text-secondary"><strong class="text-primary">Phone:</strong> +123 456 7890</p>
+            <p class="text-secondary"><strong class="text-primary">Email:</strong> contact@virusguard.example</p>
+
+            <h3 class="h5 mt-4 mb-2">What is a computer virus?</h3>
+            <p class="text-secondary">
+                A computer virus is a malicious software program designed to infect a
+                computer system, replicate itself, and spread to other devices. It
+                typically attaches itself to legitimate programs or files and can be
+                triggered when a user unknowingly runs the infected software. Once
+                activated, a virus can cause various forms of harm, such as corrupting
+                data, slowing down system performance, stealing personal information, or
+                even rendering a system unusable. Viruses spread through email
+                attachments, downloads, and compromised websites, making it crucial for
+                users to maintain strong cybersecurity practices and use updated antivirus
+                software to protect their devices.
+            </p>
+
+            <h3 class="h5 mt-4 mb-2">How do I know if my system is infected?</h3>
+            <p class="text-secondary mb-0">
+                Look for signs such as unexpected slowdowns, frequent crashes, or system
+                freezes. Unusual pop-up messages, new or unfamiliar programs starting up
+                automatically, or changes to your homepage or browser settings can also be
+                indicators. Running a full system scan with a reputable antivirus program
+                is the most reliable way to detect infections.
+            </p>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="app-card">
+                <h2 class="h4 mb-3">Send Us a Message</h2>
+                <form action="{{ url_for('ContactUs') }}" method="POST" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
