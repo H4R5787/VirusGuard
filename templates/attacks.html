@@ -1,62 +1,121 @@
 {% extends "base.html" %}
-{% block title %}Attack Library · VirusGuard{% endblock %}
+{% block title %}Threat Intelligence Knowledge Base · VirusGuard{% endblock %}
 
 {% block content %}
-{#
-    `attacks` is passed in from app.py's /Attacks route, sourced from
-    attack_data.ATTACKS — the single data source also used to render
-    attack_detail.html. This used to be a second, independently
-    hand-maintained copy of this exact list, hardcoded directly in this
-    template (and, before that, a *third* copy in a hardcoded JS array
-    that had no working links at all). One source now; the grid and the
-    detail pages can no longer drift out of sync with each other.
-#}
+<div class="page-hero">
+    <div class="container">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill" style="background-color: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25);">
+            <i class="fa-solid fa-clock-rotate-left text-info small"></i>
+            <span class="small fw-semibold text-info">Automated Knowledge Base · Daily Ingestion at 12:00 AM</span>
+        </div>
+        <h1 class="h2 text-white">Threat Intelligence Knowledge Base</h1>
+        <p class="text-secondary">
+            Continuous threat taxonomy, malware analysis, IOC tracking, and mitigations aggregated from CISA bulletins, BleepingComputer research, and global zero-day disclosures.
+        </p>
+    </div>
+</div>
 
-<div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
-    <div class="mb-4">
-        <h1 class="h3 mb-1">Attack Library</h1>
-        <p class="text-secondary mb-3">A quick reference for common malware and attack types.</p>
-        <div class="input-group" style="max-width: 420px;">
-            <span class="input-group-text" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-secondary);">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input type="search" class="form-control" id="attackSearch" placeholder="Search attack types…"
-                   style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">
+<div class="container" style="padding-bottom: 5rem;">
+
+    <!-- Filter & Search Controls -->
+    <div class="app-card shadow-sm p-3 mb-4">
+        <div class="row g-3 align-items-center">
+            <!-- Search Input -->
+            <div class="col-lg-5">
+                <form action="{{ url_for('attacks') }}" method="GET" class="d-flex">
+                    {% if category_filter %}
+                    <input type="hidden" name="category" value="{{ category_filter }}">
+                    {% endif %}
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="search" name="q" class="form-control" placeholder="Search threat vectors, malware, or categories…" value="{{ search }}" aria-label="Search threat vectors">
+                        {% if search %}
+                        <a href="{{ url_for('attacks', category=category_filter) }}" class="btn btn-outline-light" aria-label="Clear search">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="col-lg-7 d-flex flex-wrap gap-1 justify-content-lg-end">
+                <a href="{{ url_for('attacks', q=search) }}" class="btn btn-sm {{ 'btn-primary' if not category_filter else 'btn-outline-light' }}">
+                    All Vectors
+                </a>
+                {% for cat in categories %}
+                <a href="{{ url_for('attacks', category=cat, q=search) }}" class="btn btn-sm {{ 'btn-info text-white' if category_filter == cat else 'btn-outline-light' }}">
+                    {{ cat }}
+                </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
+    <!-- Live Telemetry Status Bar -->
+    <div class="d-flex align-items-center justify-content-between mb-4 text-secondary small">
+        <div class="d-flex align-items-center gap-2">
+            <span>Showing <strong class="text-white">{{ attacks|length }}</strong> Threat Vectors</span>
+            {% if category_filter %} in <span class="badge bg-dark border border-secondary text-info">{{ category_filter }}</span>{% endif %}
+        </div>
+        <div class="font-monospace small text-muted">
+            <i class="fa-solid fa-shield-virus text-success me-1"></i> {{ total_updates }} Live Disclosures &amp; IOCs Linked
+        </div>
+    </div>
+
+    <!-- Threat Vector Grid -->
+    {% if attacks %}
     <div class="row g-4" id="attackGrid">
         {% for attack in attacks %}
-        <div class="col-md-4 attack-card-col" data-name="{{ attack.title|lower }}">
-            <div class="app-card h-100 d-flex flex-column">
-                <img src="{{ url_for('static', filename='Attacks/Card/' ~ attack.card_img) }}" alt="{{ attack.title }} illustration">
-                <h3 class="h5 mt-3 mb-2">{{ attack.title }}</h3>
-                <p class="text-secondary small flex-grow-1">{{ attack.desc }}</p>
-                <a href="/attacks/{{ attack.slug }}" class="btn btn-outline-light mt-2">Learn More</a>
+        <div class="col-lg-4 col-md-6 attack-card-col">
+            <div class="app-card card-hover h-100 d-flex flex-column position-relative">
+                <div class="position-relative overflow-hidden rounded-2 mb-3">
+                    {% if attack.card_img %}
+                    <img src="{{ url_for('static', filename='Attacks/Card/' ~ attack.card_img) }}" alt="{{ attack.title }} illustration" loading="lazy">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-dark rounded-2" style="aspect-ratio: 16/9; border: 1px solid var(--border-subtle);">
+                        <i class="fa-solid fa-shield-halved fa-3x text-info opacity-50"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 border border-secondary text-info font-monospace small">
+                        {{ attack.category or "Threat Vector" }}
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <h2 class="h5 fw-bold text-white mb-0">{{ attack.title }}</h2>
+                    {% if attack.is_emerging %}
+                    <span class="badge bg-danger bg-opacity-25 text-danger font-monospace small">EMERGING</span>
+                    {% endif %}
+                </div>
+
+                <p class="text-secondary small flex-grow-1 mb-3" style="line-height: 1.6;">{{ attack.desc }}</p>
+
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-25 mt-auto">
+                    <span class="text-muted small font-monospace">
+                        <i class="fa-regular fa-clock me-1"></i>
+                        {{ attack.last_updated.strftime('%b %d, %Y') if attack.last_updated else 'Active' }}
+                    </span>
+                    <a href="/attacks/{{ attack.slug }}" class="btn btn-outline-light btn-sm">
+                        <span>View Dossier</span>
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="app-card text-center py-5">
+        <i class="fa-solid fa-magnifying-glass-chart fa-3x text-muted mb-3"></i>
+        <h3 class="h5 fw-bold text-white mb-2">No Threat Vectors Found</h3>
+        <p class="text-secondary small mb-3">No profiles matched your filter criteria.</p>
+        <a href="{{ url_for('attacks') }}" class="btn btn-outline-light btn-sm">Clear Filter</a>
+    </div>
+    {% endif %}
 
-    <p class="text-secondary text-center mt-4 d-none" id="noResults">No attack types match your search.</p>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-    const searchInput = document.getElementById('attackSearch');
-    const cards = document.querySelectorAll('.attack-card-col');
-    const noResults = document.getElementById('noResults');
-
-    searchInput.addEventListener('input', function () {
-        const query = searchInput.value.trim().toLowerCase();
-        let visibleCount = 0;
-        cards.forEach(function (card) {
-            const match = card.dataset.name.includes(query);
-            card.classList.toggle('d-none', !match);
-            if (match) visibleCount++;
-        });
-        noResults.classList.toggle('d-none', visibleCount !== 0);
-    });
-</script>
 {% endblock %}

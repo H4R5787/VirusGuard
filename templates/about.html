@@ -3,66 +3,107 @@
 
 {% block content %}
 <div class="page-hero">
-    <h1 class="h2">About VirusGuard</h1>
-    <p>Your reliable partner for file security and virus prevention.</p>
+    <div class="container">
+        <h1 class="h2 text-white">About VirusGuard</h1>
+        <p class="text-secondary">Enterprise-grade automated cybersecurity intelligence and multi-engine threat detection.</p>
+    </div>
 </div>
 
-<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
-    <div class="mb-4">
-        <h2 class="h4 mb-3">Our History</h2>
-        <p class="text-secondary">
-            Founded in 2024, VirusGuard was created with the goal of providing users with
-            a platform that ensures the safety of their data from malicious threats. With
-            a dedicated team of cybersecurity professionals, we continue to innovate and
-            adapt to the ever-evolving cyber landscape.
+<div class="container" style="max-width: 860px; padding-bottom: 5rem;">
+
+    <div class="app-card p-4 mb-4">
+        <h2 class="h4 fw-bold text-white mb-3"><i class="fa-solid fa-compass text-info me-2"></i>Our Origin &amp; Purpose</h2>
+        <p class="text-secondary" style="line-height: 1.7;">
+            Designed and engineered by <strong>Harsh Vishwakarma</strong>, <strong>VirusGuard</strong> was built to solve a persistent cybersecurity challenge: enterprise malware detection often produces cryptic hexadecimal hashes and siloed scanner signatures that confuse developers and systems engineers. By marrying multi-engine threat telemetry (VirusTotal API v3) with automated entity extraction, live threat feed correlation (CISA, BleepingComputer, The Hacker News), and LLM-powered intelligence briefings, VirusGuard delivers actionable containment guidance at enterprise speed.
         </p>
     </div>
 
-    <div class="mb-4">
-        <h2 class="h4 mb-3">Our Values</h2>
-        <p class="text-secondary mb-2">
-            We are committed to transparency, reliability, and excellence in everything we
-            do. Our values include:
-        </p>
-        <ul class="text-secondary">
-            <li>Trust and Integrity</li>
-            <li>Customer-Centric Approach</li>
-            <li>Innovation and Continuous Improvement</li>
-        </ul>
-    </div>
-
-    <div class="mb-5">
-        <h2 class="h4 mb-3">Our Vision</h2>
-        <p class="text-secondary">
-            To become the global leader in virus detection and prevention by offering
-            cutting-edge solutions and empowering individuals to take control of their
-            digital safety.
-        </p>
-    </div>
-
-    <div class="mb-5">
-        <h2 class="h4 mb-4 text-center">Meet Our Team</h2>
-        <div class="row g-4">
-            <div class="col-md-4 team-member text-center">
-                <img src="{{ url_for('static', filename='aboutUS/Founder_&_CEO_images.jpg') }}" alt="Harsh Vishwakarma">
-                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
-                <p class="text-secondary small">Founder &amp; CEO</p>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="app-card h-100 p-3 text-center">
+                <i class="fa-solid fa-lock fa-2x text-primary mb-2"></i>
+                <h3 class="h6 fw-bold text-white">Zero-Persistence Quarantine</h3>
+                <p class="text-secondary small mb-0">Ephemeral quarantine guarantees uploaded binaries are wiped immediately after analysis.</p>
             </div>
-            <div class="col-md-4 team-member text-center">
-                <img src="{{ url_for('static', filename='aboutUS/Chief_Security_Officer_images.jpg') }}" alt="Harsh Vishwakarma">
-                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
-                <p class="text-secondary small">Chief Security Officer</p>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100 p-3 text-center">
+                <i class="fa-solid fa-bolt-lightning fa-2x text-info mb-2"></i>
+                <h3 class="h6 fw-bold text-white">Sub-Second Triage</h3>
+                <p class="text-secondary small mb-0">Fast-path SHA-256 hash queries bypass redundant uploads for known signatures.</p>
             </div>
-            <div class="col-md-4 team-member text-center">
-                <img src="{{ url_for('static', filename='aboutUS/Lead_Developer_images.jpg') }}" alt="Harsh Vishwakarma">
-                <h3 class="h6 mb-0">Harsh Vishwakarma</h3>
-                <p class="text-secondary small">Lead Developer</p>
+        </div>
+        <div class="col-md-4">
+            <div class="app-card h-100 p-3 text-center">
+                <i class="fa-solid fa-brain fa-2x text-warning mb-2"></i>
+                <h3 class="h6 fw-bold text-white">Automated Threat Intel</h3>
+                <p class="text-secondary small mb-0">Daily midnight ingestion synchronizes real-world CVEs and active Indicators of Compromise (IOCs).</p>
             </div>
         </div>
     </div>
 
-    <div class="text-center">
-        <a href="/ContactUs" class="btn btn-primary btn-lg">Learn More About Us</a>
+    <!-- Creator & Lead Architect Section -->
+    <div class="app-card p-4 mb-4">
+        <h2 class="h4 fw-bold text-white mb-4 text-center"><i class="fa-solid fa-user-shield text-info me-2"></i>Creator &amp; Security Architect</h2>
+        
+        <div class="row align-items-center g-4">
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-dark border border-info shadow-lg" style="width: 110px; height: 110px;">
+                    <i class="fa-solid fa-user-shield fa-3x text-info"></i>
+                </div>
+                <h3 class="h5 fw-bold text-white mb-1">Harsh Vishwakarma</h3>
+                <p class="text-info small fw-semibold mb-1">DevOps Engineer — Cyber Security</p>
+                <p class="text-secondary small mb-3">Tata Consultancy Services (TCS)</p>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="https://h4r5787.github.io/portfolio-Harsh-Vishwakarma/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-warning" title="Portfolio">
+                        <i class="fa-solid fa-globe me-1"></i>Portfolio
+                    </a>
+                    <a href="https://github.com/H4R5787" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light" title="GitHub Profile">
+                        <i class="fab fa-github me-1"></i>GitHub
+                    </a>
+                    <a href="https://www.linkedin.com/in/harsh-vishwakarma-b88ab4410/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info" title="LinkedIn Profile">
+                        <i class="fab fa-linkedin me-1"></i>LinkedIn
+                    </a>
+                    <a href="mailto:vishwakarma.harsh.office@gmail.com" class="btn btn-sm btn-outline-secondary" title="Email Contact">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <h4 class="h6 text-uppercase text-secondary fw-bold letter-spacing-1 mb-2">Professional Background</h4>
+                <p class="text-secondary small" style="line-height: 1.7;">
+                    Computer Science graduate working full-time as a <strong>DevOps Engineer — Cyber Security at Tata Consultancy Services (TCS)</strong>, specializing in application security testing for enterprise banking and financial applications. Experienced in Dynamic Application Security Testing (DAST), Veracode platform onboarding, REST API security auditing, and complex authentication validation (MFA/SSO).
+                </p>
+
+                <h4 class="h6 text-uppercase text-secondary fw-bold letter-spacing-1 mb-2 mt-3">Core Competencies</h4>
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                    <span class="badge bg-dark border border-secondary text-light">DAST Testing</span>
+                    <span class="badge bg-dark border border-secondary text-light">Veracode</span>
+                    <span class="badge bg-dark border border-secondary text-light">API Security</span>
+                    <span class="badge bg-dark border border-secondary text-light">MFA / SSO Validation</span>
+                    <span class="badge bg-dark border border-secondary text-light">OWASP Top 10</span>
+                    <span class="badge bg-dark border border-secondary text-light">Burp Suite</span>
+                    <span class="badge bg-dark border border-secondary text-light">Python &amp; Flask</span>
+                    <span class="badge bg-dark border border-secondary text-light">DevSecOps</span>
+                    <span class="badge bg-dark border border-secondary text-light">Linux &amp; Bash</span>
+                </div>
+
+                <h4 class="h6 text-uppercase text-secondary fw-bold letter-spacing-1 mb-2">Certifications &amp; Honors</h4>
+                <ul class="list-unstyled text-secondary small mb-0">
+                    <li class="mb-1"><i class="fa-solid fa-certificate text-warning me-2"></i><strong>Google Cybersecurity Professional Certificate</strong> — Coursera</li>
+                    <li class="mb-1"><i class="fa-solid fa-shield-virus text-info me-2"></i><strong>Ethical Hacker Certification</strong> — Cisco</li>
+                    <li><i class="fa-solid fa-trophy text-warning me-2"></i><strong>Top 100, TCS HackQuest Season 9</strong> — National Cybersecurity Competition</li>
+                </ul>
+            </div>
+        </div>
     </div>
+
+    <div class="text-center pt-3">
+        <a href="/Missions" class="btn btn-outline-light me-2">Our Mission &amp; Values</a>
+        <a href="/ContactUs" class="btn btn-primary">Connect With Us</a>
+    </div>
+
 </div>
 {% endblock %}

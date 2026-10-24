@@ -1,38 +1,72 @@
 {% extends "base.html" %}
-{% block title %}Create an Account · VirusGuard{% endblock %}
+{% block title %}Create Security Account · VirusGuard{% endblock %}
 
 {% block content %}
 <div class="auth-shell">
-    <div class="auth-card">
-        <h2 class="mb-1">Create an account</h2>
-        <p class="text-secondary mb-4">Scan files and get plain-English threat explanations.</p>
+    <div class="auth-card shadow-lg">
+        <div class="text-center mb-4">
+            <div class="d-inline-flex p-3 rounded-circle mb-2" style="background-color: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25);">
+                <i class="fa-solid fa-user-plus fa-2x text-info"></i>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-1">Create Account</h1>
+            <p class="text-secondary small mb-0">Join VirusGuard for threat analysis and intelligence reporting.</p>
+        </div>
 
-        <form action="/Register" method="POST" novalidate>
+        <form action="{{ url_for('Register') }}" method="POST" novalidate id="registerForm">
+            <!-- CSRF Protection -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required autofocus>
+                <label for="name" class="form-label">Full Name or Security Handle</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-regular fa-user"></i>
+                    </span>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Harsh Vishwakarma" required autofocus>
+                </div>
             </div>
+
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <label for="email" class="form-label">Corporate or Personal Email</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-regular fa-envelope"></i>
+                    </span>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="analyst@domain.com" required autocomplete="email">
+                </div>
             </div>
+
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="password" name="password" required minlength="8">
-                    <button class="btn btn-outline-light" type="button" id="togglePassword" aria-label="Show password">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password">
+                    <button class="btn btn-outline-light" type="button" id="togglePassword" aria-label="Toggle password visibility">
                         <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
                     </button>
                 </div>
-                <div class="progress mt-2" style="height: 4px;">
+                <!-- Strength Indicator -->
+                <div class="progress mt-2" style="height: 4px; background-color: var(--bg-surface-alt);">
                     <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%"></div>
                 </div>
-                <small class="text-secondary" id="strengthLabel">At least 8 characters</small>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <small class="text-muted" id="strengthLabel">Enter at least 8 characters</small>
+                    <small class="text-secondary font-monospace" id="strengthScore"></small>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3">Create account</button>
-            <p class="text-center small text-secondary mb-0">
-                Already have an account? <a href="/login">Sign in</a>
-            </p>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 mt-2" id="regSubmitBtn">
+                <span>Create Security Account</span>
+                <i class="fa-solid fa-arrow-right ms-1"></i>
+            </button>
+
+            <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <p class="small text-secondary mb-0">
+                    Already registered? <a href="/login" class="text-info fw-semibold">Sign in here</a>
+                </p>
+            </div>
         </form>
     </div>
 </div>
@@ -43,21 +77,24 @@
     const toggleBtn = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('togglePasswordIcon');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthLabel = document.getElementById('strengthLabel');
+    const strengthScore = document.getElementById('strengthScore');
+    const registerForm = document.getElementById('registerForm');
+    const regSubmitBtn = document.getElementById('regSubmitBtn');
+
     toggleBtn.addEventListener('click', function () {
         const isHidden = passwordInput.type === 'password';
         passwordInput.type = isHidden ? 'text' : 'password';
         toggleIcon.classList.toggle('fa-eye');
         toggleIcon.classList.toggle('fa-eye-slash');
-        toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
     });
 
-    const strengthBar = document.getElementById('strengthBar');
-    const strengthLabel = document.getElementById('strengthLabel');
     const strengthMeta = [
-        { color: '#ff5c5c', label: 'Weak' },
-        { color: '#ffb020', label: 'Fair' },
-        { color: '#4f8cff', label: 'Good' },
-        { color: '#34c77b', label: 'Strong' },
+        { color: '#ef4444', label: 'Weak', score: '25%' },
+        { color: '#f59e0b', label: 'Fair', score: '50%' },
+        { color: '#3b82f6', label: 'Good', score: '75%' },
+        { color: '#10b981', label: 'Strong', score: '100%' },
     ];
 
     function scorePassword(value) {
@@ -70,16 +107,24 @@
     }
 
     passwordInput.addEventListener('input', function () {
-        const score = scorePassword(passwordInput.value);
-        if (!passwordInput.value) {
+        const val = passwordInput.value;
+        if (!val) {
             strengthBar.style.width = '0%';
-            strengthLabel.textContent = 'At least 8 characters';
+            strengthLabel.textContent = 'Enter at least 8 characters';
+            strengthScore.textContent = '';
             return;
         }
+        const score = scorePassword(val);
         const meta = strengthMeta[Math.max(score - 1, 0)];
         strengthBar.style.width = (score / 4 * 100) + '%';
         strengthBar.style.backgroundColor = meta.color;
         strengthLabel.textContent = meta.label;
+        strengthScore.textContent = meta.score;
+    });
+
+    registerForm.addEventListener('submit', function () {
+        regSubmitBtn.disabled = true;
+        regSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Registering Account...';
     });
 </script>
 {% endblock %}

@@ -1,64 +1,183 @@
 {% extends "base.html" %}
-{% block title %}{{ attack.title }} · Attack Library · VirusGuard{% endblock %}
+{% block title %}{{ attack.title }} · Threat Dossier · VirusGuard{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 860px; padding-top: 2rem; padding-bottom: 4rem;">
+<div class="container" style="max-width: 900px; padding-top: 2.5rem; padding-bottom: 5rem;">
 
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/Attacks">Attack Library</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ attack.title }}</li>
-        </ol>
-    </nav>
+    <!-- Breadcrumb & Auto-Sync Status -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/Attacks" class="text-secondary"><i class="fa-solid fa-database me-1"></i>Threat Library</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ attack.title }}</li>
+            </ol>
+        </nav>
+        <div class="badge bg-dark border border-secondary text-secondary font-monospace small">
+            <i class="fa-solid fa-clock-rotate-left text-info me-1"></i>
+            Updated: {{ attack.last_updated.strftime('%b %d, %Y') if attack.last_updated else 'Daily' }}
+        </div>
+    </div>
 
-    <img src="{{ attack.hero_img }}" alt="{{ attack.title }} illustration" class="attack-hero-img mb-4">
+    <!-- Hero Image Banner -->
+    <div class="position-relative overflow-hidden rounded-3 mb-4 border border-secondary border-opacity-25 shadow-lg">
+        {% if attack.hero_img %}
+        <img src="{{ attack.hero_img }}" alt="{{ attack.title }} overview diagram" class="attack-hero-img w-100" style="max-height: 380px; object-fit: cover;">
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-dark p-5" style="border: 1px solid var(--border-subtle);">
+            <i class="fa-solid fa-shield-virus fa-4x text-info opacity-50"></i>
+        </div>
+        {% endif %}
+    </div>
 
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
-        <h1 class="h3 mb-0">{{ attack.long_title }}</h1>
+    <!-- Threat Vector Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 font-monospace">
+                    {{ attack.category or "THREAT VECTOR" }}
+                </span>
+                {% if attack.is_emerging %}
+                <span class="badge bg-danger bg-opacity-25 text-danger font-monospace">EMERGING THREAT</span>
+                {% endif %}
+            </div>
+            <h1 class="h2 fw-bold text-white mb-0">{{ attack.long_title }}</h1>
+        </div>
         {% if attack.external_link %}
-        <a href="{{ attack.external_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light text-nowrap">
-            Try an interactive lesson <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
+        <a href="{{ attack.external_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm text-nowrap">
+            <span>Reference Lab</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
         </a>
         {% endif %}
     </div>
 
-    <p class="text-secondary fs-5 mb-4">{{ attack.intro }}</p>
+    <!-- Executive Summary -->
+    <div class="p-4 rounded-3 mb-4" style="background-color: var(--bg-surface-alt); border: 1px solid var(--border-subtle);">
+        <h2 class="h6 text-info text-uppercase font-monospace mb-2">
+            <i class="fa-solid fa-circle-info me-1"></i> Executive Dossier Briefing
+        </h2>
+        <p class="text-light mb-0" style="line-height: 1.7; font-size: 1.05rem;">{{ attack.intro }}</p>
+    </div>
 
+    <!-- Core Attack Anatomy Sections -->
+    <h2 class="h5 fw-bold text-white mb-3">
+        <i class="fa-solid fa-layer-group text-primary me-2"></i>Attack Mechanics &amp; Execution Breakdown
+    </h2>
     <div class="accordion mb-5" id="attackAccordion">
         {% for section in attack.sections %}
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h3 class="accordion-header">
                 <button class="accordion-button {{ '' if loop.first else 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#attackSection{{ loop.index }}">
-                    {{ section.heading }}
+                    <i class="fa-solid fa-shield-halved me-2 text-info"></i>
+                    <span>{{ section.heading }}</span>
                 </button>
-            </h2>
+            </h3>
             <div id="attackSection{{ loop.index }}" class="accordion-collapse collapse {{ 'show' if loop.first }}" data-bs-parent="#attackAccordion">
-                <div class="accordion-body">{{ section.body }}</div>
+                <div class="accordion-body">
+                    {{ section.body | nl2br }}
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <div class="app-card text-center mb-5">
-        <h2 class="h5 mb-2">Think a file might be affected?</h2>
-        <p class="text-secondary mb-3">Scan it with VirusGuard and get a plain-English explanation of anything we find.</p>
-        <a href="{{ '/scan' if session.get('name') else '/Register' }}" class="btn btn-primary">Scan a file</a>
+    <!-- Live Ingestion: Real-World Threat Intelligence, Malware Analyses & IOCs -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-radar fa-lg text-danger"></i>
+                <h2 class="h5 fw-bold text-white mb-0">Active Threat Intelligence &amp; Malware Analyses</h2>
+            </div>
+            <span class="badge bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25 font-monospace small">
+                LIVE TELEMETRY FEED
+            </span>
+        </div>
+
+        {% if intel_updates %}
+            {% for item in intel_updates %}
+            <div class="app-card mb-3 p-4 border-subtle">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-warning bg-opacity-25 text-warning font-monospace small">
+                            {{ item.update_type }}
+                        </span>
+                        {% if item.cve_id %}
+                        <span class="badge bg-dark border border-secondary text-info font-monospace small">
+                            {{ item.cve_id }}
+                        </span>
+                        {% endif %}
+                        <span class="badge bg-dark border border-secondary text-secondary small">
+                            {{ item.source_name }}
+                        </span>
+                    </div>
+                    <span class="text-muted font-monospace small">
+                        {{ item.published_date.strftime('%b %d, %Y') if item.published_date else 'Recent' }}
+                    </span>
+                </div>
+
+                <h3 class="h6 fw-bold text-white mb-2">
+                    <a href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none hover-cyan">
+                        {{ item.title }}
+                    </a>
+                </h3>
+
+                <p class="text-secondary small mb-3" style="line-height: 1.6;">{{ item.summary }}</p>
+
+                <!-- IOC Box (if available) -->
+                {% if item.iocs %}
+                <div class="p-2 px-3 rounded-2 mb-3 bg-dark border border-secondary border-opacity-25 font-monospace small text-info">
+                    <span class="text-muted me-1"><i class="fa-solid fa-fingerprint me-1"></i>Active IOCs:</span>
+                    <span>{{ item.iocs }}</span>
+                </div>
+                {% endif %}
+
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-25">
+                    <span class="text-muted small">Verified source: {{ item.source_name }}</span>
+                    <a href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm">
+                        <span>Original Advisory</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="app-card text-center py-4 text-secondary">
+                <i class="fa-solid fa-radar fa-2x text-muted mb-2"></i>
+                <p class="mb-0 small">No active zero-day campaigns targeting this specific vector in the last 24 hours. The automated scheduler checks daily at 12:00 AM.</p>
+            </div>
+        {% endif %}
     </div>
 
+    <!-- Callout Box -->
+    <div class="app-card text-center p-4 mb-5 border-info border-opacity-25" style="background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, rgba(15, 20, 31, 0.9) 100%);">
+        <h3 class="h5 fw-bold text-white mb-2">Test Suspicious Payloads Safely</h3>
+        <p class="text-secondary small mb-3 mx-auto" style="max-width: 520px;">
+            Submit files to VirusGuard's multi-engine analysis console to verify against 70+ vendor signatures with instant Llama 3 70B AI explanations.
+        </p>
+        <a href="{{ '/scan' if session.get('name') else '/Register' }}" class="btn btn-primary">
+            <i class="fa-solid fa-crosshairs me-1"></i> Submit Sample for Analysis
+        </a>
+    </div>
+
+    <!-- Related Threat Vectors -->
     {% if related %}
-    <h2 class="h5 mb-3">Related attacks</h2>
+    <h3 class="h5 fw-bold text-white mb-3">Related Attack Vectors</h3>
     <div class="row g-4">
         {% for r in related %}
         <div class="col-md-4">
-            <div class="app-card h-100 d-flex flex-column">
-                <img src="{{ url_for('static', filename='Attacks/Card/' ~ r.card_img) }}" alt="{{ r.title }} illustration">
-                <h3 class="h6 mt-3 mb-2">{{ r.title }}</h3>
-                <p class="text-secondary small flex-grow-1">{{ r.desc }}</p>
-                <a href="/attacks/{{ r.slug }}" class="btn btn-outline-light btn-sm mt-2">Learn More</a>
+            <div class="app-card card-hover h-100 d-flex flex-column p-3">
+                {% if r.card_img %}
+                <img src="{{ url_for('static', filename='Attacks/Card/' ~ r.card_img) }}" alt="{{ r.title }}" class="rounded-2 mb-2" style="aspect-ratio: 16/9; object-fit: cover;">
+                {% endif %}
+                <h4 class="h6 fw-bold text-white mb-1">{{ r.title }}</h4>
+                <p class="text-secondary small flex-grow-1 mb-2">{{ r.desc }}</p>
+                <a href="/attacks/{{ r.slug }}" class="btn btn-outline-light btn-sm mt-auto">
+                    View Dossier
+                </a>
             </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
+
 </div>
 {% endblock %}

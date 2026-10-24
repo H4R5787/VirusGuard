@@ -1,28 +1,38 @@
 <nav class="navbar navbar-expand-lg app-navbar sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{{ '/scan' if session.get('name') else '/' }}">
-            <i class="fa-solid fa-shield-halved me-1"></i> VirusGuard
+            <i class="fa-solid fa-shield-halved brand-icon" aria-hidden="true"></i>
+            <span>VirusGuard</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
                 {% if session.get('name') %}
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/scan' }}" href="/scan">Scan</a>
+                    <a class="nav-link {{ 'active' if request.path == '/scan' }}" href="/scan">
+                        <i class="fa-solid fa-crosshairs me-1"></i> Scan Console
+                    </a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/' }}" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/about' }}" href="/about">About</a>
+                    <a class="nav-link {{ 'active' if request.path == '/' }}" href="/">Overview</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/Attacks' }}" href="/Attacks">Attack Library</a>
+                    <a class="nav-link {{ 'active' if request.path == '/Attacks' or '/attacks/' in request.path }}" href="/Attacks">
+                        <i class="fa-solid fa-database me-1"></i> Threat Library
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.path == '/Post' }}" href="/Post">
+                        <i class="fa-solid fa-newspaper me-1"></i> Security News
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.path == '/about' }}" href="/about">About</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.path == '/Help' }}" href="/Help">Help</a>
@@ -32,31 +42,40 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-lg-center">
                 {% if session.get('admin') %}
-                <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/admin' }}" href="/admin">Admin</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Logout</a>
-                </li>
-                {% elif session.get('name') %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-circle-user me-1"></i>{{ session.get('name') }}
+                <li class="nav-item me-2">
+                    <a class="nav-link {{ 'active' if request.path == '/admin' }}" href="/admin">
+                        <i class="fa-solid fa-user-shield me-1 text-primary"></i> Admin Panel
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                        <li><a class="dropdown-item" href="/scan">My Scans</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a></li>
+                </li>
+                {% endif %}
+
+                {% if session.get('name') %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-circle-user fa-lg"></i>
+                        <span>{{ session.get('name') }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userMenu">
+                        <li class="dropdown-header text-secondary small">{{ session.get('email') }}</li>
+                        <li><a class="dropdown-item" href="/scan"><i class="fa-solid fa-shield-virus me-2"></i>Scan File</a></li>
+                        {% if session.get('admin') %}
+                        <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gear me-2"></i>Administration</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign Out</a></li>
                     </ul>
                 </li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link {{ 'active' if request.path == '/login' }}" href="/login">Login</a>
+                <li class="nav-item me-2">
+                    <a class="nav-link {{ 'active' if request.path == '/login' }}" href="/login">Sign In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-primary btn-sm ms-lg-2" href="/Register">Register</a>
+                    <a class="btn btn-primary btn-sm" href="/Register">
+                        <span>Get Started</span>
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
                 </li>
                 {% endif %}
             </ul>

@@ -1,51 +1,191 @@
 {% extends "base.html" %}
-{% block title %}VirusGuard — Scan, Learn, Stay Safe{% endblock %}
+{% block title %}VirusGuard — Enterprise AI Threat Intelligence & Malware Detection{% endblock %}
 
 {% block content %}
-<section class="container" style="padding-top: 4rem; padding-bottom: 3rem;">
-    <div class="row align-items-center g-5">
-        <div class="col-lg-7">
-            <h1 class="display-5 fw-bold mb-3">
-                Know what's in your files <span style="color: var(--accent-primary);">before</span> it's a problem.
-            </h1>
-            <p class="text-secondary fs-5 mb-4">
-                Upload a file, we check it against VirusTotal, and if something's wrong you get
-                a plain-English explanation — not just a red icon.
-            </p>
-            {% if session.get('name') %}
-            <a href="/scan" class="btn btn-primary btn-lg">Go to Scan</a>
-            {% else %}
-            <a href="/Register" class="btn btn-primary btn-lg">Get Started</a>
-            {% endif %}
-        </div>
-        <div class="col-lg-5 text-center d-none d-lg-block">
-            <i class="fa-solid fa-shield-halved" style="font-size: 10rem; color: var(--accent-primary); opacity: 0.85;" aria-hidden="true"></i>
+<!-- Hero Section -->
+<section class="position-relative overflow-hidden" style="padding: 5rem 0 4rem; background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 65%);">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill" style="background-color: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25);">
+                    <i class="fa-solid fa-bolt-lightning text-info small"></i>
+                    <span class="small fw-semibold text-info">Next-Gen Threat Telemetry & Generative AI</span>
+                </div>
+                <h1 class="display-4 fw-extrabold mb-3 text-white" style="letter-spacing: -0.03em; line-height: 1.15;">
+                    Actionable Malware Intelligence <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Before Threats Strike</span>
+                </h1>
+                <p class="text-secondary fs-5 mb-4" style="max-width: 580px; line-height: 1.6;">
+                    Analyze suspicious binaries, scripts, and archives across leading antivirus engines. VirusGuard leverages Llama 3 70B to transform raw heuristic signatures into structured, human-readable containment strategies.
+                </p>
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    {% if session.get('name') %}
+                    <a href="/scan" class="btn btn-primary btn-lg px-4">
+                        <i class="fa-solid fa-crosshairs me-1"></i> Open Scan Console
+                    </a>
+                    {% else %}
+                    <a href="/Register" class="btn btn-primary btn-lg px-4">
+                        <span>Get Started Free</span>
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="/login" class="btn btn-outline-light btn-lg px-4">
+                        Sign In
+                    </a>
+                    {% endif %}
+                    <a href="/Attacks" class="btn btn-link text-secondary text-decoration-none ms-2">
+                        Browse Encyclopedia <i class="fa-solid fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+
+                <div class="d-flex align-items-center gap-4 mt-5 pt-3 border-top border-secondary border-opacity-25 text-secondary small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-shield-check text-success"></i>
+                        <span>VirusTotal v3 Telemetry</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-microchip text-info"></i>
+                        <span>Groq-Accelerated Llama 3</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-lock text-warning"></i>
+                        <span>Ephemeral Quarantine</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal / Dashboard Preview Illustration -->
+            <div class="col-lg-5">
+                <div class="app-card shadow-lg p-0 overflow-hidden" style="border: 1px solid rgba(59, 130, 246, 0.3);">
+                    <div class="p-3 d-flex align-items-center justify-content-between border-bottom border-subtle" style="background-color: var(--bg-surface-alt);">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background-color: #ef4444;"></span>
+                            <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background-color: #f59e0b;"></span>
+                            <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background-color: #10b981;"></span>
+                            <span class="ms-2 small text-secondary font-monospace">virusguard-core.py</span>
+                        </div>
+                        <span class="badge bg-success bg-opacity-25 text-success small font-monospace">SOC LIVE</span>
+                    </div>
+                    <div class="p-4 font-monospace" style="font-size: 0.8125rem; background-color: #070a0f;">
+                        <div class="text-secondary mb-2">$ virusguard scan --target sample_payload.bin</div>
+                        <div class="text-info mb-1"><i class="fa-solid fa-circle-notch fa-spin me-1"></i> Calculating SHA-256 digest...</div>
+                        <div class="text-secondary small mb-2 ps-3">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                        <div class="text-info mb-1"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Querying VirusTotal v3 multi-engine telemetry...</div>
+                        <div class="text-danger fw-bold mb-2">VERDICT: Malicious (Troj/Generic-AVX flagged)</div>
+                        <div class="text-secondary mb-1">--- Llama 3 Threat Briefing ---</div>
+                        <div class="text-light opacity-75 small">
+                            "Sample demonstrates persistence via HKCU registry run keys and initiates outbound encrypted telemetry over port 443."
+                        </div>
+                        <div class="mt-3 text-success small">
+                            <i class="fa-solid fa-check-double me-1"></i> Ephemeral sample wiped from quarantine storage.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="container" style="padding-bottom: 4rem;">
+<!-- 3-Pillar Workflow Section -->
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="h3 fw-bold text-white mb-2">Comprehensive Threat Defense Lifecycle</h2>
+        <p class="text-secondary mx-auto" style="max-width: 600px;">
+            Engineered to streamline malware triage from raw file ingestion to intelligent containment insights.
+        </p>
+    </div>
+
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="app-card h-100">
-                <i class="fa-solid fa-magnifying-glass-chart fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Scan</h3>
-                <p class="text-secondary mb-0">Drag and drop a file and get a VirusTotal-backed verdict in seconds.</p>
+            <div class="app-card card-hover h-100 p-4">
+                <div class="d-inline-flex p-3 rounded-3 mb-3" style="background-color: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.2);">
+                    <i class="fa-solid fa-shield-virus fa-2x text-primary" aria-hidden="true"></i>
+                </div>
+                <h3 class="h5 text-white mb-2">1. Multi-Engine Verification</h3>
+                <p class="text-secondary mb-0">
+                    Direct integration with VirusTotal API v3 aggregates detection verdicts from major antivirus scanners, eliminating single-vendor blind spots.
+                </p>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="app-card h-100">
-                <i class="fa-solid fa-graduation-cap fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Learn</h3>
-                <p class="text-secondary mb-0">Browse a library of common malware and attack types, explained simply.</p>
+            <div class="app-card card-hover h-100 p-4">
+                <div class="d-inline-flex p-3 rounded-3 mb-3" style="background-color: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2);">
+                    <i class="fa-solid fa-brain fa-2x text-info" aria-hidden="true"></i>
+                </div>
+                <h3 class="h5 text-white mb-2">2. Llama 3 Intelligence</h3>
+                <p class="text-secondary mb-0">
+                    Groq-accelerated Llama 3 parses engine signatures into clear 4-part security briefs detailing threat history, attack mechanics, and practical remedies.
+                </p>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="app-card h-100">
-                <i class="fa-solid fa-bell fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Alerts</h3>
-                <p class="text-secondary mb-0">If a threat is found, you get an AI-generated explanation and an email alert.</p>
+            <div class="app-card card-hover h-100 p-4">
+                <div class="d-inline-flex p-3 rounded-3 mb-3" style="background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <i class="fa-solid fa-bell-slash fa-2x text-warning" aria-hidden="true"></i>
+                </div>
+                <h3 class="h5 text-white mb-2">3. Ephemeral Isolation</h3>
+                <p class="text-secondary mb-0">
+                    Uploaded files are safely randomized in a segregated sandbox and wiped immediately following analysis, ensuring zero residual contamination.
+                </p>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Threat Intelligence Feature Highlight -->
+<section class="container py-5 border-top border-subtle">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <span class="badge bg-primary bg-opacity-15 text-primary border border-primary border-opacity-25 mb-2">Knowledge Base</span>
+            <h2 class="h3 fw-bold text-white mb-3">Interactive Cybersecurity Threat Library</h2>
+            <p class="text-secondary mb-4">
+                Explore in-depth dossiers on 12 distinct attack vectors—including Ransomware, SQL Injection, Cross-Site Scripting, Rootkits, and Cryptojacking. Each guide provides structural diagrams, common CVE references, and defense guidelines.
+            </p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="badge bg-dark border border-secondary text-secondary">Ransomware</span>
+                <span class="badge bg-dark border border-secondary text-secondary">SQL Injection</span>
+                <span class="badge bg-dark border border-secondary text-secondary">Rootkits</span>
+                <span class="badge bg-dark border border-secondary text-secondary">Trojan Horses</span>
+                <span class="badge bg-dark border border-secondary text-secondary">Spyware</span>
+                <span class="badge bg-dark border border-secondary text-secondary">Cryptojacking</span>
+            </div>
+            <a href="/Attacks" class="btn btn-outline-light">
+                <span>Explore All 12 Threat Profiles</span>
+                <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-secondary small font-monospace"><i class="fa-solid fa-database me-1 text-info"></i> ATTACK VECTOR TAXONOMY</span>
+                    <span class="badge bg-danger bg-opacity-25 text-danger small">HIGH SEVERITY</span>
+                </div>
+                <h3 class="h5 text-white mb-2">Ransomware Mechanics & Cryptographic Locks</h3>
+                <p class="text-secondary small mb-3">
+                    Ransomware encrypts master boot records and files using asymmetric public-key cryptography (RSA-4096 / AES-256). Learn proactive mitigations including immutable air-gapped backups.
+                </p>
+                <div class="p-3 rounded-2 bg-dark border border-secondary border-opacity-25 font-monospace text-secondary small">
+                    Mitigation Checklist: Principle of Least Privilege (PoLP), strict EDR monitoring, disabled SMBv1 protocols.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="container py-5 mb-4">
+    <div class="app-card text-center p-5 position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.15) 0%, rgba(15, 20, 31, 0.95) 100%); border-color: rgba(59, 130, 246, 0.35);">
+        <h2 class="display-6 fw-bold text-white mb-3">Start Analyzing Your Files Safely</h2>
+        <p class="text-secondary fs-5 mx-auto mb-4" style="max-width: 540px;">
+            Create your account today and gain immediate access to multi-engine scanning and automated threat intelligence.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            {% if session.get('name') %}
+            <a href="/scan" class="btn btn-primary btn-lg px-4">Go to Scan Console</a>
+            {% else %}
+            <a href="/Register" class="btn btn-primary btn-lg px-4">Create Free Account</a>
+            <a href="/login" class="btn btn-outline-light btn-lg px-4">Sign In</a>
+            {% endif %}
         </div>
     </div>
 </section>

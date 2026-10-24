@@ -1,118 +1,249 @@
 {% extends "base.html" %}
-{% block title %}Admin · VirusGuard{% endblock %}
+{% block title %}Administrative Governance · VirusGuard{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
-    <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-3">
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+
+    <!-- Admin Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
-            <h1 class="h3 mb-1">Registered Users</h1>
-            <p class="text-secondary mb-0">
-                {{ pagination.total }} user{{ '' if pagination.total == 1 else 's' }}{{ ' matching “%s”' % search if search }}.
-            </p>
-        </div>
-        <form action="{{ url_for('admin') }}" method="GET" class="d-flex" style="max-width: 320px;">
-            <div class="input-group">
-                <span class="input-group-text" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-secondary);">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 font-monospace">
+                    RBAC LEVEL 1
                 </span>
-                <input type="search" name="q" class="form-control" placeholder="Search name or email…" value="{{ search }}">
-                {% if search %}
-                <a href="{{ url_for('admin') }}" class="btn btn-outline-light" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></a>
-                {% endif %}
+                <span class="text-secondary small font-monospace">ACCESS GRANTED</span>
             </div>
-        </form>
+            <h1 class="h3 fw-bold text-white mb-0">System Administration & Governance</h1>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark border border-secondary text-secondary p-2">
+                <i class="fa-solid fa-users text-info me-1"></i> {{ pagination.total }} Users
+            </span>
+            <span class="badge bg-dark border border-secondary text-secondary p-2">
+                <i class="fa-solid fa-envelope text-warning me-1"></i> {{ total_messages }} Inquiries
+            </span>
+            <span class="badge bg-dark border border-secondary text-secondary p-2">
+                <i class="fa-solid fa-rss text-success me-1"></i> {{ total_advisories }} Advisories
+            </span>
+            <span class="badge bg-dark border border-secondary text-secondary p-2">
+                <i class="fa-solid fa-shield-virus text-cyan me-1"></i> {{ total_intel_updates }} Threat Updates
+            </span>
+        </div>
     </div>
 
-    {#
-        Note: the previous version of this page also referenced a `posts`
-        variable and shipped a "Create a New Post" form and a "Settings"
-        form, neither of which the backend ever wired up (no route handled
-        either submission, and `posts` was never passed to the template —
-        rendering this page would have raised a Jinja UndefinedError on
-        `posts|length`). Removed both rather than ship dead UI; add them
-        back once there's a real feature behind them.
-    #}
+    <!-- Automated Daily Ingestion Engine Control Card -->
+    <div class="app-card shadow-sm p-4 mb-4" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 20, 31, 0.95) 100%); border-color: rgba(6, 182, 212, 0.25);">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 font-monospace small">
+                        <i class="fa-solid fa-clock me-1"></i>12:00 AM MIDNIGHT AUTOMATION ACTIVE
+                    </span>
+                    <span class="text-secondary small font-monospace">Daily scheduled background job active</span>
+                </div>
+                <h2 class="h5 fw-bold text-white mb-0">Automated Threat Intelligence &amp; Advisories Engine</h2>
+                <p class="text-secondary small mb-0">
+                    Daily scheduled daemon crawls CISA Bulletins, BleepingComputer research, and The Hacker News disclosures every midnight.
+                </p>
+            </div>
+        </div>
 
-    {% if users %}
-    <div class="table-responsive app-card">
-        <table class="table app-table align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        {% if user.is_admin %}
-                        <span class="badge" style="background-color: var(--accent-secondary);">Admin</span>
-                        {% else %}
-                        <span class="text-secondary small">User</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-end">
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
+        <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+            <form action="{{ url_for('admin_sync_threat_intel') }}" method="POST" class="mb-0">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-database me-1"></i> Sync Threat Knowledge Base Now
+                </button>
+            </form>
 
-                <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content" style="background-color: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle);">
-                            <div class="modal-header border-secondary">
-                                <h5 class="modal-title">Delete user?</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                This will permanently remove <strong>{{ user.name }}</strong> ({{ user.email }}). This can't be undone.
-                            </div>
-                            <div class="modal-footer border-secondary">
-                                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" class="mb-0">
-                                    <button type="submit" class="btn btn-danger">Delete user</button>
-                                </form>
+            <form action="{{ url_for('admin_sync_advisories') }}" method="POST" class="mb-0">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                    <i class="fa-solid fa-rotate me-1 text-success"></i> Sync Vulnerability Advisories Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Section 1: User Management -->
+    <div class="app-card shadow-lg p-4 mb-5">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div>
+                <h2 class="h5 fw-bold text-white mb-1">User Directory & Role Management</h2>
+                <p class="text-secondary small mb-0">
+                    Search and manage authenticated user records and administrative privileges.
+                </p>
+            </div>
+            <form action="{{ url_for('admin') }}" method="GET" class="d-flex" style="max-width: 340px;">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="search" name="q" class="form-control" placeholder="Search name or email…" value="{{ search }}">
+                    {% if search %}
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline-light" aria-label="Clear search">
+                        <i class="fa-solid fa-xmark"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Name</th>
+                        <th>Email Address</th>
+                        <th>Access Role</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="font-monospace text-secondary">#{{ user.id }}</td>
+                        <td class="fw-semibold text-white">{{ user.name }}</td>
+                        <td class="text-secondary font-monospace small">{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="badge-admin"><i class="fa-solid fa-shield me-1"></i>Administrator</span>
+                            {% else %}
+                            <span class="badge-user">Standard User</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if user.email == session.get('email') %}
+                            <span class="badge bg-dark border border-secondary text-secondary" title="Active session">Current Session</span>
+                            {% else %}
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
+                                <i class="fa-regular fa-trash-can me-1"></i> Delete
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Delete User Confirmation Modal -->
+                    <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-labelledby="modalLabel{{ user.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background-color: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle);">
+                                <div class="modal-header border-secondary border-opacity-25">
+                                    <h5 class="modal-title fw-bold text-danger" id="modalLabel{{ user.id }}">
+                                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Delete User Account?
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-secondary">
+                                    Are you sure you want to permanently delete user <strong class="text-white">{{ user.name }}</strong> (<code>{{ user.email }}</code>)? All associated session privileges will be revoked immediately.
+                                </div>
+                                <div class="modal-footer border-secondary border-opacity-25">
+                                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" class="mb-0">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if pagination.pages > 1 %}
+        <nav aria-label="User navigation" class="mt-4">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                    <a class="page-link bg-dark border-secondary text-secondary" href="{{ url_for('admin', page=pagination.prev_num, q=search) if pagination.has_prev else '#' }}">Previous</a>
+                </li>
+                {% for p in pagination.iter_pages() %}
+                <li class="page-item {{ 'active' if p == pagination.page }} {{ 'disabled' if not p }}">
+                    {% if p %}
+                    <a class="page-link {{ 'bg-primary border-primary text-white' if p == pagination.page else 'bg-dark border-secondary text-secondary' }}" href="{{ url_for('admin', page=p, q=search) }}">{{ p }}</a>
+                    {% else %}
+                    <span class="page-link bg-dark border-secondary text-muted">…</span>
+                    {% endif %}
+                </li>
                 {% endfor %}
-            </tbody>
-        </table>
+                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                    <a class="page-link bg-dark border-secondary text-secondary" href="{{ url_for('admin', page=pagination.next_num, q=search) if pagination.has_next else '#' }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5 text-secondary">
+            <i class="fa-solid fa-user-slash fa-2x mb-3 text-muted"></i>
+            <p class="mb-0">{{ 'No users found matching query “%s”.' % search if search else 'No registered users in database.' }}</p>
+        </div>
+        {% endif %}
     </div>
 
-    {% if pagination.pages > 1 %}
-    <nav aria-label="User list pages" class="mt-4">
-        <ul class="pagination justify-content-center mb-0">
-            <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
-                <a class="page-link" href="{{ url_for('admin', page=pagination.prev_num, q=search) if pagination.has_prev else '#' }}" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">Previous</a>
-            </li>
-            {% for p in pagination.iter_pages() %}
-            <li class="page-item {{ 'active' if p == pagination.page }} {{ 'disabled' if not p }}">
-                {% if p %}
-                <a class="page-link" href="{{ url_for('admin', page=p, q=search) }}" style="background-color: {{ 'var(--accent-primary)' if p == pagination.page else 'var(--bg-surface-alt)' }}; border-color: var(--border-subtle); color: var(--text-primary);">{{ p }}</a>
-                {% else %}
-                <span class="page-link" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-disabled);">…</span>
-                {% endif %}
-            </li>
-            {% endfor %}
-            <li class="page-item {{ 'disabled' if not pagination.has_next }}">
-                <a class="page-link" href="{{ url_for('admin', page=pagination.next_num, q=search) if pagination.has_next else '#' }}" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-primary);">Next</a>
-            </li>
-        </ul>
-    </nav>
-    {% endif %}
-    {% else %}
-    <div class="app-card text-center text-secondary py-5">
-        <i class="fa-solid fa-users-slash fa-2x mb-3"></i>
-        <p class="mb-0">{{ 'No users match “%s”.' % search if search else 'No users yet.' }}</p>
+    <!-- Section 2: Contact Inquiries (Restored & Accessible) -->
+    <div class="app-card shadow-lg p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h2 class="h5 fw-bold text-white mb-1">
+                    <i class="fa-solid fa-inbox text-warning me-2"></i>Contact Messages & Inquiries
+                </h2>
+                <p class="text-secondary small mb-0">Direct messages submitted through the public Contact portal.</p>
+            </div>
+            <span class="badge bg-dark border border-secondary text-secondary font-monospace">
+                Total: {{ total_messages }}
+            </span>
+        </div>
+
+        {% if messages %}
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Message Content</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages %}
+                    <tr>
+                        <td class="font-monospace text-muted small" style="white-space: nowrap;">
+                            {{ msg.created_at.strftime('%Y-%m-%d %H:%M') if msg.created_at else 'Recent' }}
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-white">{{ msg.name }}</div>
+                            <div class="small text-secondary font-monospace">{{ msg.email }}</div>
+                        </td>
+                        <td class="text-info fw-semibold">{{ msg.subject }}</td>
+                        <td class="text-secondary small" style="max-width: 320px;">
+                            {{ msg.message }}
+                        </td>
+                        <td class="text-end">
+                            <form action="{{ url_for('delete_message', message_id=msg.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this message?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="Delete message">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-secondary">
+            <i class="fa-regular fa-envelope-open fa-2x mb-2 text-muted"></i>
+            <p class="mb-0 small">No contact inquiries have been received yet.</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
+
 </div>
 {% endblock %}

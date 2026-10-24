@@ -57,6 +57,7 @@ Modern cybersecurity analysis tools often present users with cryptic telemetry (
 - 🛡️ **Role-Based Access Control (RBAC):** Database-backed administrative role (`is_admin`) with fallback migration safeguards.
 - 📊 **Administrative Control Panel:** Full user lifecycle management featuring real-time search queries and paginated database records.
 - 📚 **Threat Knowledgebase:** Dynamic, data-driven attack library detailing attack mechanics, types, real-world CVEs, and mitigation strategies.
+- ⚡ **Automated 12:00 AM Daily Ingestion:** Background scheduler automatically queries CISA advisories and zero-day feeds every midnight without manual intervention.
 - 📬 **Interactive Support & Contact System:** Persistent contact and inquiries pipeline stored in the database.
 - 🎨 **Modern Futuristic UI/UX:** Responsive cybersecurity-themed aesthetic with cyber-glow styling, modal feedback, and flash alert notifications.
 
@@ -138,20 +139,26 @@ flowchart TD
 ## 📁 Project Structure
 
 ```text
-Virus-Detection-System-main/
+VirusGuard/
 ├── .env.example                # Template for environment variables and secrets
-├── .gitignore                  # Git ignore rules for virtual environments, uploads, and secrets
-├── README.md                   # Enterprise documentation and system guide
+├── .gitignore                  # Git ignore rules for virtual environments, uploads, and caches
+├── Procfile                    # Render & Heroku WSGI entry configuration
+├── render.yaml                 # Render infrastructure-as-code blueprint specification
+├── pytest.ini                  # Pytest configuration and path discovery
+├── README.md                   # Complete enterprise documentation and architecture guide
 ├── REDESIGN_PROGRESS.md        # Architecture transition and feature tracking document
-├── requirements.txt            # Production Python package dependencies
+├── requirements.txt            # Production Python package dependencies (Flask, Gunicorn, etc.)
 │
-├── app.py                      # Core Flask application, routing, models, and endpoints
+├── app.py                      # Core Flask application, routing, models, CSRF, and AI pipeline
 ├── attack_data.py              # Centralized encyclopedia dataset for attack vectors & CVEs
-├── virus_scanner.py            # VirusTotal API v3 scanning, upload-URL handler & polling client
-├── alert_system.py             # SMTP-based security alert notification dispatcher
-├── file_handler.py             # Secure local file staging and disk storage utility
+├── virus_scanner.py            # VirusTotal API v3 multi-engine scanner & fast-path hash client
+├── alert_system.py             # Configurable SMTP security alert notification dispatcher
+├── file_handler.py             # Secure file quarantine, SHA-256 calculation & auto-deletion
 │
-├── static/                     # Static media and CSS assets
+├── tests/                      # Automated test suite (pytest)
+│   └── test_app.py             # Unit & integration tests for routes, auth, files & APIs
+│
+├── static/                     # Static media and modern design system assets
 │   ├── css/
 │   │   ├── app.css             # Main application layout, components, and responsive grid
 │   │   └── tokens.css          # Design tokens (colors, typography, spacing, glow variables)
@@ -450,18 +457,111 @@ VirusGuard includes built-in guides covering 11 critical cyber threat categories
 
 ---
 
+## 🧪 Automated Testing Suite
+
+VirusGuard includes a comprehensive automated test suite powered by `pytest` and Flask's test client covering authentication, RBAC, input validation, file quarantine, mocked VirusTotal scans, Groq AI fallbacks, and security headers:
+
+```bash
+# Run the complete test suite
+pytest -v
+
+# Run with coverage summary
+pytest --tb=short
+```
+
+Mocked testing ensures that external APIs are not queried during CI/CD runs and no API quotas are consumed.
+
+---
+
 ## 🚢 Production Deployment Guide
 
-### Using Gunicorn (WSGI) & Nginx on Linux
+### Option A: Render Free Tier (Recommended Cloud Deployment)
+
+VirusGuard is fully optimized for **Render Free Tier** web services:
+- Lightweight resource footprint (< 512MB RAM)
+- Fast-path SHA-256 hash lookups preventing long worker hangs
+- Gunicorn WSGI server with multi-threaded workers (`--workers=2 --threads=4 --timeout=60`)
+- Native `/health` zero-downtime monitoring endpoint
+- Ephemeral quarantine storage with automatic file deletion
+
+#### 1. Push Code to GitHub
+Ensure all changes, including `Procfile` and `render.yaml`, are committed to your GitHub repository:
+```bash
+git push origin main
+```
+
+#### 2. Create a Web Service on Render
+1. Navigate to the **[Render Dashboard](https://dashboard.render.com/)** and click **New +** → **Web Service**.
+2. Connect your GitHub repository (`H4R5787/VirusGuard`).
+3. Select **Python** as the runtime environment.
+4. Set the build and start commands:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn --workers=2 --threads=4 --timeout=60 --bind=0.0.0.0:$PORT app:app`
+5. Select the **Free** instance type.
+
+#### 3. Configure Environment Variables in Render
+In the **Environment** tab of your Render service, configure:
+
+| Variable | Recommended Value / Description |
+| :--- | :--- |
+| `PYTHON_VERSION` | `3.11.9` |
+| `FLASK_ENV` | `production` |
+| `RENDER` | `true` |
+| `SECRET_KEY` | Click **Generate** (or enter a 32-byte hex string) |
+| `DATABASE_URL` | Render PostgreSQL URL (`postgresql://...`) or default SQLite |
+| `VIRUSTOTAL_API_KEY` | Your VirusTotal v3 API Key |
+| `GROQ_API_KEY` | Your Groq Cloud API Key (`gsk_...`) |
+| `ADMIN_EMAIL` | `Admin@gmail.com` (or your preferred admin email) |
+| `ADMIN_PASSWORD` | Strong password for initial admin bootstrapping |
+
+#### 4. Ephemeral Filesystem & Database Note for Render Free Tier
+> [!IMPORTANT]
+> - **Database Persistence:** On Render Free Tier, the local disk is ephemeral and resets during spin-downs. For persistent user accounts, threat intelligence updates, and advisories in production, create a free **Render PostgreSQL database** (or Neon / Supabase PostgreSQL) and paste its connection string into `DATABASE_URL`.
+> - **Ephemeral Quarantine:** Quarantined samples in `uploads/` are deleted immediately after scanning via `file_handler.delete_file()`, ensuring zero disk bloat on Render.
+
+---
+
+### 🕒 Automated 12:00 AM Threat Intelligence & Advisories Engine
+
+VirusGuard features a fully automated threat intelligence and vulnerability advisory engine that updates every day at **12:00 AM (Midnight)** without requiring manual intervention:
+
+#### 1. Ingestion Feeds & Correlation
+- **CISA Cybersecurity Advisories (Official US-CERT alerts & bulletins)**
+- **BleepingComputer Cybersecurity Research Feed**
+- **The Hacker News Threat Intelligence & Zero-Day Feed**
+- **Automated Entity Extraction:** Automatically extracts CVE IDs (`CVE-YYYY-NNNNN`) and Indicators of Compromise (IOCs: SHA-256/MD5 hashes, malicious IP addresses).
+- **Categorization & Mapping:** Classifies intelligence into canonical threat vectors (`Ransomware`, `SQL_Injection`, `Trojan_horse`, `Command_Execution`, `Phishing`, etc.) and automatically updates vector `last_updated` timestamps.
+- **Strict Deduplication:** Guaranteed uniqueness enforced at the database level via canonical `source_url` index.
+
+#### 2. Render Free Tier Architecture (Three-Tier Reliability)
+Because Render Free Tier web services spin down after 15 minutes of inactivity, VirusGuard employs a robust three-tier execution strategy:
+1. **Background Daemon Scheduler (`advisory_scheduler.py`):** Runs when the service is active, computes seconds until 12:00 AM UTC/Local, sleeps until midnight, and executes both `sync_latest_advisories()` and `sync_threat_intelligence()`.
+2. **Boot Catch-up Sync:** Whenever the app spins up or restarts (e.g. on visitor wake-up), a background thread checks catalog freshness and ingests any missed updates 5 seconds post-boot without blocking the HTTP server.
+3. **External Cron / Webhook Integration:** You can ping authenticated endpoints from an external cron service (such as [cron-job.org](https://cron-job.org/) or Render Cron):
+   - `POST https://your-app.onrender.com/api/sync-threat-intel`
+   - `POST https://your-app.onrender.com/api/sync-advisories`
+   *(Optional: protect with `CRON_SECRET` header `Authorization: Bearer <CRON_SECRET>`)*
+
+#### 3. CLI & Manual Triggers
+- **CLI Ingestion Scripts:**
+  ```bash
+  python sync_threat_intel.py   # Ingest latest threat vectors and IOCs
+  python sync_advisories.py     # Ingest latest CVE security advisories
+  ```
+- **Admin Dashboard Trigger:** Authenticated administrators can click the **Sync Threat Intel Now** or **Sync Advisories Now** buttons in the `/admin` portal for instant on-demand synchronization.
+
+---
+
+### Option B: Linux Server (Gunicorn & Nginx Reverse Proxy)
 
 #### 1. Install Production Dependencies
 ```bash
-pip install gunicorn
+pip install -r requirements.txt
 ```
 
 #### 2. Run Gunicorn Worker Pool
 ```bash
-gunicorn --workers 4 --bind 127.0.0.1:8000 app:app
+gunicorn --workers 2 --threads 4 --timeout 60 --bind 127.0.0.1:8000 app:app
 ```
 
 #### 3. Configure Nginx Reverse Proxy
@@ -472,7 +572,7 @@ server {
     listen 80;
     server_name yourdomain.com;
 
-    client_max_body_size 64M;
+    client_max_body_size 32M;
 
     location / {
         proxy_pass http://127.0.0.1:8000;
@@ -480,6 +580,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
     }
 
     location /static/ {
@@ -558,7 +659,15 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
 
 ## 👨‍💻 Author & Acknowledgements
 
-- **Harsh** ([@H4R5787](https://github.com/H4R5787)) - *Lead Developer & Architect*
-- **VirusTotal** for the multi-engine analysis API.
-- **Groq & Meta AI** for the Llama 3 70B inference engine.
+- **Harsh Vishwakarma** — *Lead Developer & Security Architect*
+  - **Current Role:** DevOps Engineer — Cyber Security at **Tata Consultancy Services (TCS)**
+  - **Specialization:** Dynamic Application Security Testing (DAST), Veracode Onboarding, API Security Testing, MFA/SSO Authentication Validation, DevSecOps & Security Tooling
+  - **Portfolio:** [h4r5787.github.io/portfolio-Harsh-Vishwakarma](https://h4r5787.github.io/portfolio-Harsh-Vishwakarma/)
+  - **GitHub:** [@H4R5787](https://github.com/H4R5787)
+  - **LinkedIn:** [harsh-vishwakarma-b88ab4410](https://www.linkedin.com/in/harsh-vishwakarma-b88ab4410/)
+  - **Email:** [vishwakarma.harsh.office@gmail.com](mailto:vishwakarma.harsh.office@gmail.com)
+  - **Certifications:** Google Cybersecurity Professional Certificate, Cisco Ethical Hacker Certification, Top 100 TCS HackQuest Season 9
+- **VirusTotal** for the multi-engine analysis API v3.
+- **Groq & Meta AI** for ultra-fast Llama & open-weights threat intelligence inference.
+- **CISA, BleepingComputer & The Hacker News** for authoritative threat intelligence feeds.
 - **Flask & SQLAlchemy Communities** for open-source frameworks.

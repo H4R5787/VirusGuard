@@ -1,64 +1,70 @@
 {% extends "base.html" %}
-{% block title %}Our Mission · VirusGuard{% endblock %}
+{% block title %}Mission & Core Values · VirusGuard{% endblock %}
 
 {% block content %}
 <div class="page-hero">
-    <h1 class="h2">Our Mission</h1>
+    <div class="container">
+        <h1 class="h2 text-white">Our Mission & Security Commitments</h1>
+        <p class="text-secondary">Empowering organizations and developers with transparent, intelligent threat defense.</p>
+    </div>
 </div>
 
-<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
-    <div class="mb-5">
-        <h2 class="h4 mb-3">Committed to Your Security</h2>
-        <p class="text-secondary">
-            VirusGuard exists to provide a reliable and secure platform that helps users
-            detect potential virus threats and safeguard their systems.
+<div class="container" style="max-width: 820px; padding-bottom: 5rem;">
+
+    <div class="app-card p-4 mb-4">
+        <h2 class="h4 fw-bold text-white mb-3"><i class="fa-solid fa-bullseye text-primary me-2"></i>Democratizing Threat Intelligence</h2>
+        <p class="text-secondary" style="line-height: 1.7;">
+            In today's interconnected landscape, advanced persistent threats (APTs) and ransomware syndicates target systems of every scale. Traditional enterprise threat intelligence platforms are frequently locked behind cost-prohibitive subscriptions and complex enterprise contracts. 
         </p>
-        <p class="text-secondary">
-            Our goal is to educate users on how viruses work and how they can protect
-            themselves, in addition to providing real-time scanning services. Through our
-            platform, you can upload files and receive comprehensive reports that detail
-            the virus origin, characteristics, and preventive measures.
+        <p class="text-secondary mb-0" style="line-height: 1.7;">
+            VirusGuard’s mission is to provide an agile, open, and reliable threat triage platform that equips software engineers, system administrators, and students with the same analytical depth deployed by Tier-1 Security Operations Centers.
         </p>
     </div>
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="app-card h-100 text-center">
-                <i class="fa-solid fa-bullseye fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Our Values</h3>
-                <p class="text-secondary mb-0">
-                    We believe in transparency, data security, and empowering our users
-                    through education and awareness. Our platform prioritizes user
-                    confidentiality and secure file management.
+            <div class="app-card h-100 p-4 text-center">
+                <i class="fa-solid fa-scale-balanced fa-2x text-info mb-3"></i>
+                <h3 class="h5 fw-bold text-white">Integrity</h3>
+                <p class="text-secondary small mb-0">
+                    Unbiased telemetry gathered directly from multi-engine antivirus consensus, presented without fearmongering or inflated risk scores.
                 </p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="app-card h-100 text-center">
-                <i class="fa-solid fa-shield-halved fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Our Goals</h3>
-                <p class="text-secondary mb-0">
-                    To provide the most effective, user-friendly, and reliable virus
-                    scanning platform that educates users about potential threats and how
-                    to combat them.
+            <div class="app-card h-100 p-4 text-center">
+                <i class="fa-solid fa-user-shield fa-2x text-success mb-3"></i>
+                <h3 class="h5 fw-bold text-white">Privacy-First</h3>
+                <p class="text-secondary small mb-0">
+                    We maintain an ephemeral file lifecycle. Samples are quarantined in isolation and immediately purged once analysis concludes.
                 </p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="app-card h-100 text-center">
-                <i class="fa-solid fa-people-group fa-2x mb-3" style="color: var(--accent-primary);" aria-hidden="true"></i>
-                <h3 class="h5">Get Involved</h3>
-                <p class="text-secondary mb-0">
-                    Join us in our mission to spread awareness and build a safer digital
-                    environment. Together, we can fight cyber threats and enhance security
-                    for everyone.
+            <div class="app-card h-100 p-4 text-center">
+                <i class="fa-solid fa-graduation-cap fa-2x text-warning mb-3"></i>
+                <h3 class="h5 fw-bold text-white">Education</h3>
+                <p class="text-secondary small mb-0">
+                    We believe the most resilient defense is an informed workforce. We publish open dossiers explaining threat mechanics simply.
                 </p>
             </div>
         </div>
     </div>
 
-    <div class="text-center">
-        <a href="/ContactUs" class="btn btn-primary btn-lg">Learn More &amp; Get Involved</a>
+    <div class="app-card p-4 text-center">
+        <h3 class="h5 fw-bold text-white mb-2">Join the VirusGuard Security Community</h3>
+        <p class="text-secondary small mb-4 mx-auto" style="max-width: 500px;">
+            Contribute to threat awareness, report newly identified attack vectors, or inspect our open-source codebase on GitHub.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="https://github.com/H4R5787/VirusGuard" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light">
+                <i class="fab fa-github me-1"></i> View Repository
+            </a>
+            <a href="/ContactUs" class="btn btn-primary">
+                <i class="fa-solid fa-envelope me-1"></i> Contact Security Desk
+            </a>
+        </div>
     </div>
+
 </div>
 {% endblock %}

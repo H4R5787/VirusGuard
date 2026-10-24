@@ -1,70 +1,175 @@
 {% extends "base.html" %}
-{% block title %}Security News · VirusGuard{% endblock %}
+{% block title %}Vulnerability Advisories & Threat Alerts · VirusGuard{% endblock %}
 
 {% block content %}
-{#
-    Previously 512 lines with the post content, chrome, and inline <style>
-    all duplicated together. The 5 posts below are the same content, now
-    data plus a single reusable .post-card component instead of 5 hand-built
-    copies of the same markup.
-#}
-{% set posts = [
-    {
-        "title": "Understanding CVE-2024-27348: A Wake-Up Call for Apache HugeGraph Users",
-        "author": "Zeyad Azima",
-        "date": "April 22, 2024",
-        "img": "CVE-2024-27348.jpg",
-        "text": "May brought alarming news for Apache HugeGraph-Server users with the discovery of CVE-2024-27348. This critical vulnerability allows unauthenticated users to execute OS commands remotely, putting your systems at risk. Affected versions are Apache HugeGraph-Server before 1.3.0; attackers can gain complete control of vulnerable systems through Groovy injection. Upgrade to version 1.3.0 or later to safeguard your systems against this serious threat."
-    },
-    {
-        "title": "Addressing the High-Severity CVE-2024-24919 in Check Point Security Gateways",
-        "author": "Security Desk",
-        "date": "May 28, 2024",
-        "img": "CVE-2024-24919.jpg",
-        "text": "Security professionals should take note of CVE-2024-24919, a high-severity information disclosure vulnerability affecting Check Point Security Gateways with IPSec VPN or Mobile Access blades, actively exploited since April. Unauthorized access to sensitive information could facilitate further network attacks. Update your gateway immediately to apply the security hotfix and implement multi-factor authentication."
-    },
-    {
-        "title": "GitLab Patches Critical XSS Vulnerability: CVE-2024-4835",
-        "author": "Vlad Constantinescu",
-        "date": "May 23, 2024",
-        "img": "CVE-2024-4835.jpg",
-        "text": "In May, GitLab released patches for CVE-2024-4835, a critical cross-site scripting vulnerability (CVSS score: 8.0) that could have let attackers steal user credentials through crafted malicious web pages. Upgrade to GitLab versions 17.0.1, 16.11.3, or 16.10.6 to mitigate this vulnerability."
-    },
-    {
-        "title": "Protecting Your QNAP NAS Devices from CVE-2024-27130",
-        "author": "Security Desk",
-        "date": "May 21, 2024",
-        "img": "CVE-2024-27130.jpg",
-        "text": "CVE-2024-27130 poses a serious threat to QNAP NAS devices running QTS: a critical Remote Code Execution vulnerability letting attackers access sensitive data and disrupt operations without needing login credentials. Update to QTS version 5.1.7.2770 or later to close this vulnerability."
-    },
-    {
-        "title": "Critical Authentication Bypass in GitHub Enterprise Server: CVE-2024-4985",
-        "author": "Security Desk",
-        "date": "May 20, 2024",
-        "img": "CVE-2024-4985.jpg",
-        "text": "GitHub Enterprise Server users need to address CVE-2024-4985, which allows attackers to bypass authentication completely on Enterprise Server versions prior to 3.13.0, granting unauthorized access to sensitive code repositories. Upgrade to the patched versions 3.9.15, 3.10.12, 3.11.10, or 3.12.4."
-    },
-] %}
-
 <div class="page-hero">
-    <h1 class="h2">Security News</h1>
-    <p>Recent vulnerability disclosures worth knowing about.</p>
+    <div class="container">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill" style="background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25);">
+            <i class="fa-solid fa-clock-rotate-left text-success small"></i>
+            <span class="small fw-semibold text-success">Automated Ingestion · Daily at 12:00 AM</span>
+        </div>
+        <h1 class="h2 text-white">Vulnerability Advisories & Security Alerts</h1>
+        <p class="text-secondary">
+            Continuous real-time threat intelligence aggregated from official CISA bulletins, NVD vulnerability databases, and global zero-day disclosures.
+        </p>
+    </div>
 </div>
 
-<div class="container" style="max-width: 780px; padding-bottom: 4rem;">
-    {% for post in posts %}
-    <div class="app-card post-card mb-4">
-        <div class="row g-4 align-items-start">
-            <div class="col-md-4">
-                <img src="{{ url_for('static', filename='Post/' ~ post.img) }}" alt="">
+<div class="container" style="max-width: 920px; padding-bottom: 5rem;">
+
+    <!-- Filter and Search Controls -->
+    <div class="app-card shadow-sm p-3 mb-4">
+        <div class="row g-3 align-items-center">
+            <!-- Search Form -->
+            <div class="col-lg-6">
+                <form action="{{ url_for('Post') }}" method="GET" class="d-flex">
+                    {% if severity_filter %}
+                    <input type="hidden" name="severity" value="{{ severity_filter }}">
+                    {% endif %}
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="search" name="q" class="form-control" placeholder="Search by CVE, keyword, or vendor…" value="{{ search }}">
+                        {% if search %}
+                        <a href="{{ url_for('Post', severity=severity_filter) }}" class="btn btn-outline-light" aria-label="Clear search">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
             </div>
-            <div class="col-md-8">
-                <h2 class="h5 mb-1">{{ post.title }}</h2>
-                <p class="post-meta mb-2">By {{ post.author }} · {{ post.date }}</p>
-                <p class="text-secondary mb-0">{{ post.text }}</p>
+
+            <!-- Severity Pills -->
+            <div class="col-lg-6 d-flex flex-wrap gap-1 justify-content-lg-end">
+                <a href="{{ url_for('Post', q=search) }}" class="btn btn-sm {{ 'btn-primary' if not severity_filter else 'btn-outline-light' }}">
+                    All
+                </a>
+                <a href="{{ url_for('Post', severity='CRITICAL', q=search) }}" class="btn btn-sm {{ 'btn-danger' if severity_filter == 'CRITICAL' else 'btn-outline-light' }}">
+                    <i class="fa-solid fa-skull-crossbones me-1"></i> Critical
+                </a>
+                <a href="{{ url_for('Post', severity='HIGH', q=search) }}" class="btn btn-sm {{ 'btn-warning text-dark' if severity_filter == 'HIGH' else 'btn-outline-light' }}">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> High
+                </a>
+                <a href="{{ url_for('Post', severity='MEDIUM', q=search) }}" class="btn btn-sm {{ 'btn-info text-white' if severity_filter == 'MEDIUM' else 'btn-outline-light' }}">
+                    Medium
+                </a>
             </div>
         </div>
     </div>
-    {% endfor %}
+
+    <!-- Feed Meta Info -->
+    <div class="d-flex align-items-center justify-content-between mb-3 text-secondary small">
+        <div>
+            Showing <strong class="text-white">{{ pagination.total }}</strong> advisories
+            {% if severity_filter %} flagged as <span class="badge bg-dark border border-secondary text-info">{{ severity_filter }}</span>{% endif %}
+            {% if search %} matching <strong class="text-white">“{{ search }}”</strong>{% endif %}
+        </div>
+        <div class="font-monospace small text-muted">
+            <i class="fa-solid fa-bolt text-warning me-1"></i> Auto-refreshes 12:00 AM
+        </div>
+    </div>
+
+    <!-- Advisories Listing -->
+    {% if advisories %}
+        {% for item in advisories %}
+        <article class="app-card card-hover mb-4 p-4 position-relative overflow-hidden">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Severity Badge -->
+                    {% if item.severity == 'CRITICAL' %}
+                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 font-monospace small">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i>CRITICAL
+                        </span>
+                    {% elif item.severity == 'HIGH' %}
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 font-monospace small">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>HIGH SEVERITY
+                        </span>
+                    {% else %}
+                        <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25 font-monospace small">
+                            {{ item.severity }}
+                        </span>
+                    {% endif %}
+
+                    <!-- CVE ID Badge -->
+                    {% if item.cve_id %}
+                        <a href="{{ url_for('Post', q=item.cve_id) }}" class="badge bg-dark border border-secondary text-info text-decoration-none font-monospace small">
+                            <i class="fa-solid fa-hashtag me-1"></i>{{ item.cve_id }}
+                        </a>
+                    {% endif %}
+
+                    <!-- Source Badge -->
+                    <span class="badge bg-dark border border-secondary text-secondary small">
+                        <i class="fa-solid fa-building-shield me-1"></i>{{ item.source }}
+                    </span>
+                </div>
+
+                <div class="text-muted font-monospace small">
+                    <i class="fa-regular fa-calendar me-1"></i>
+                    {{ item.published_date.strftime('%b %d, %Y') if item.published_date else 'Recent' }}
+                </div>
+            </div>
+
+            <!-- Title -->
+            <h2 class="h5 fw-bold text-white mb-2">
+                <a href="{{ item.external_url }}" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none hover-cyan">
+                    {{ item.title }}
+                </a>
+            </h2>
+
+            <!-- Summary -->
+            <p class="text-secondary small mb-3" style="line-height: 1.65;">
+                {{ item.summary }}
+            </p>
+
+            <!-- Bottom Actions -->
+            <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-25">
+                <div class="text-muted small">
+                    <i class="fa-regular fa-user me-1"></i> Source: {{ item.author or item.source }}
+                </div>
+                <div>
+                    <a href="{{ item.external_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm">
+                        <span>Read Advisory</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+
+        <!-- Pagination Controls -->
+        {% if pagination.pages > 1 %}
+        <nav aria-label="Advisories pagination" class="mt-4">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                    <a class="page-link bg-dark border-secondary text-secondary" href="{{ url_for('Post', page=pagination.prev_num, q=search, severity=severity_filter) if pagination.has_prev else '#' }}">Previous</a>
+                </li>
+                {% for p in pagination.iter_pages() %}
+                <li class="page-item {{ 'active' if p == pagination.page }} {{ 'disabled' if not p }}">
+                    {% if p %}
+                    <a class="page-link {{ 'bg-primary border-primary text-white' if p == pagination.page else 'bg-dark border-secondary text-secondary' }}" href="{{ url_for('Post', page=p, q=search, severity=severity_filter) }}">{{ p }}</a>
+                    {% else %}
+                    <span class="page-link bg-dark border-secondary text-muted">…</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                    <a class="page-link bg-dark border-secondary text-secondary" href="{{ url_for('Post', page=pagination.next_num, q=search, severity=severity_filter) if pagination.has_next else '#' }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="app-card text-center py-5">
+            <i class="fa-solid fa-shield-cat fa-3x text-muted mb-3"></i>
+            <h3 class="h5 fw-bold text-white mb-2">No Security Advisories Found</h3>
+            <p class="text-secondary small mb-3">
+                No alerts match your current filter query. Clear your filters or check back after the midnight ingestion run.
+            </p>
+            <a href="{{ url_for('Post') }}" class="btn btn-outline-light btn-sm">Clear All Filters</a>
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}

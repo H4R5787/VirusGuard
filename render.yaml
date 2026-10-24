@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: virusguard
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers=2 --threads=4 --timeout=60 --bind=0.0.0.0:$PORT app:app
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: RENDER
+        value: "true"
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ADMIN_EMAIL
+        value: Admin@gmail.com
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true

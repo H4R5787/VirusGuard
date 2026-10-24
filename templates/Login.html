@@ -1,31 +1,56 @@
 {% extends "base.html" %}
-{% block title %}Sign In · VirusGuard{% endblock %}
+{% block title %}Sign In · VirusGuard Security Console{% endblock %}
 
 {% block content %}
 <div class="auth-shell">
-    <div class="auth-card">
-        <h2 class="mb-1">Sign in</h2>
-        <p class="text-secondary mb-4">Welcome back. Scan a file or check your history.</p>
-
-        <form action="/login" method="POST" novalidate>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required autofocus>
+    <div class="auth-card shadow-lg">
+        <div class="text-center mb-4">
+            <div class="d-inline-flex p-3 rounded-circle mb-2" style="background-color: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25);">
+                <i class="fa-solid fa-shield-halved fa-2x text-info"></i>
             </div>
+            <h1 class="h3 fw-bold text-white mb-1">Access Security Console</h1>
+            <p class="text-secondary small mb-0">Sign in with your authorized credentials.</p>
+        </div>
+
+        <form action="{{ url_for('Login') }}" method="POST" novalidate id="loginForm">
+            <!-- CSRF Protection -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="email" class="form-label">Email Address</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="password" name="password" required>
-                    <button class="btn btn-outline-light" type="button" id="togglePassword" aria-label="Show password">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-regular fa-envelope"></i>
+                    </span>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="analyst@domain.com" required autofocus autocomplete="email">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="password" class="form-label mb-0">Password</label>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <button class="btn btn-outline-light" type="button" id="togglePassword" aria-label="Toggle password visibility">
                         <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
                     </button>
                 </div>
             </div>
-            <div class="d-flex justify-content-between mb-3">
-                <a href="#" class="small text-secondary" tabindex="-1" aria-disabled="true" title="Not built yet">Forgot password?</a>
-                <a href="/Register" class="small">Create an account</a>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 mt-2" id="loginSubmitBtn">
+                <span>Sign In to Console</span>
+                <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
+            </button>
+
+            <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <p class="small text-secondary mb-0">
+                    Need an account? <a href="/Register" class="text-info fw-semibold">Register here</a>
+                </p>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Sign in</button>
         </form>
     </div>
 </div>
@@ -36,12 +61,19 @@
     const toggleBtn = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('togglePasswordIcon');
+    const loginForm = document.getElementById('loginForm');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
     toggleBtn.addEventListener('click', function () {
         const isHidden = passwordInput.type === 'password';
         passwordInput.type = isHidden ? 'text' : 'password';
         toggleIcon.classList.toggle('fa-eye');
         toggleIcon.classList.toggle('fa-eye-slash');
-        toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+    loginForm.addEventListener('submit', function () {
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Authenticating...';
     });
 </script>
 {% endblock %}
