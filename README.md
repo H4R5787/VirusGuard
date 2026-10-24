@@ -5,9 +5,10 @@
 [![Database](https://img.shields.io/badge/SQLAlchemy-2.0%2B-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org/)
 [![AI Engine](https://img.shields.io/badge/Groq_Cloud-Llama_3_70B-F55036?style=for-the-badge&logo=meta&logoColor=white)](https://groq.com/)
 [![Threat Intel](https://img.shields.io/badge/VirusTotal-API_v3-3949AB?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com/)
+[![Tests](https://img.shields.io/badge/Tests-24%20Passed-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-> **VirusGuard** is an enterprise-grade cybersecurity analysis and threat intelligence platform built with Flask, SQLAlchemy, VirusTotal API v3, and Groq-accelerated Llama 3 (70B). It combines multi-engine antivirus telemetry with generative AI explanations to deliver actionable, human-readable insights for detected malware, alongside an administrative control panel and an interactive threat encyclopedia.
+> **VirusGuard** is an enterprise-grade cybersecurity analysis and threat intelligence platform built with Flask, SQLAlchemy, VirusTotal API v3, Groq-accelerated Llama 3 (70B), and automated CISA/NVD intelligence pipelines. It bridges multi-engine antivirus telemetry with generative AI explanations to deliver actionable, human-readable insights for detected malware, alongside an administrative SOC console, automated midnight threat synchronization, and a live threat encyclopedia.
 
 ---
 
@@ -19,21 +20,23 @@
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [Component Breakdown](#-component-breakdown)
-- [Installation \& Setup](#-installation--setup)
+- [Installation & Setup](#-installation--setup)
 - [Environment Configuration](#-environment-configuration)
-- [Database Schema \& Models](#-database-schema--models)
-- [Authentication \& Authorization Flow](#-authentication--authorization-flow)
-- [Malware Scanning \& AI Pipeline](#-malware-scanning--ai-pipeline)
-- [API \& Route Reference](#-api--route-reference)
-- [Admin Dashboard](#-admin-dashboard)
+- [Database Schema & Models](#-database-schema--models)
+- [Authentication & Authorization Flow](#-authentication--authorization-flow)
+- [Malware Scanning & AI Pipeline](#-malware-scanning--ai-pipeline)
+- [Automated Threat Intelligence Engine](#-automated-threat-intelligence-engine)
+- [API & Route Reference](#-api--route-reference)
+- [Admin & SOC Dashboard](#-admin--soc-dashboard)
 - [Threat Intelligence Encyclopedia](#-threat-intelligence-encyclopedia)
 - [Security Implementations](#-security-implementations)
+- [Automated Testing Suite](#-automated-testing-suite)
 - [Production Deployment Guide](#-production-deployment-guide)
 - [Troubleshooting](#-troubleshooting)
 - [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Author \& Acknowledgements](#-author--acknowledgements)
+- [Author & Acknowledgements](#-author--acknowledgements)
 
 ---
 
@@ -41,25 +44,29 @@
 
 Modern cybersecurity analysis tools often present users with cryptic telemetry (hex dumps, raw engine verdicts, heuristic flags) that non-specialist engineers and everyday users struggle to interpret. **VirusGuard** bridges this gap:
 
-1. **Upload & Multi-Engine Verification:** Uploaded binaries, documents, and archives are analyzed through the **VirusTotal v3 API**, aggregating threat verdicts across 70+ industry antivirus engines.
-2. **Generative AI Explanation:** If malicious payloads are detected, VirusGuard feeds the engine signatures and behavioral flags into **Llama 3-70B** via the high-throughput **Groq Cloud API**. The model outputs structured, plain-language insights detailing virus history, operational mechanics, and remediation/prevention steps.
-3. **Automated SOC Alerts:** Detected threats trigger automated alert dispatching via the built-in email notification system.
-4. **Threat Encyclopedia:** A centralized malware database offering in-depth articles on 11 distinct attack vectors (SQLi, XSS, RCE, Trojans, Spyware, Worms, Adware, Keyloggers, Phishing, Rootkits, Ransomware, Cryptojacking).
-5. **Secure Administrative Governance:** Admin portal providing user management, search, and pagination.
+1. **Fast-Path & Multi-Engine Verification:** Files submitted to VirusGuard undergo instant SHA-256 fingerprint verification against **VirusTotal API v3**, querying 70+ industry antivirus engines without unnecessary file uploads. Unseen samples are quarantined and dynamically analyzed with polling mechanisms.
+2. **Generative AI Explanation:** If malicious payloads are detected, VirusGuard feeds the engine signatures, detection family, and behavioral flags into **Llama 3-70B** via the high-throughput **Groq Cloud API**. The model outputs structured, plain-language insights detailing malware identity, historical origins, operational mechanics, and actionable remediation/prevention steps.
+3. **Automated SOC Alerts:** Confirmed threats trigger instant alert dispatching to the configured security operations team via SMTP.
+4. **Live Threat Intelligence & CISA Advisories:** Ingests official **CISA Cybersecurity Advisories (US-CERT)**, **BleepingComputer**, and **The Hacker News** feeds. Automatically extracts CVEs, Indicators of Compromise (IOCs), and correlates them with 11 primary attack vectors.
+5. **Automated 12:00 AM Midnight Synchronizer:** Background scheduler queries threat feeds every midnight with a zero-downtime boot-catchup routine for serverless/ephemeral hosts.
+6. **Threat Encyclopedia:** A centralized malware database offering in-depth articles on 11 distinct attack vectors with real-world CVEs and live IOC feeds.
+7. **Secure Administrative Governance:** Admin portal providing user lifecycle management, message review, threat synchronization triggers, and real-time database search.
 
 ---
 
 ## 🚀 Key Features
 
-- 🔍 **Multi-Engine Malware Detection:** Direct integration with VirusTotal v3, supporting large file uploads up to 32MB+ with polling mechanisms.
+- 🔍 **Multi-Engine Malware Detection:** Direct integration with VirusTotal v3, supporting SHA-256 hash pre-checks and multi-chunk file uploads.
 - 🧠 **AI-Powered Threat Analysis (Llama 3-70B):** Generates 4-part structured intelligence reports covering identity, history, mechanics, and prevention.
+- ⚡ **Automated Midnight Intelligence Ingestion:** Background scheduler updates CISA advisories, threat vectors, and zero-day feeds every night at 12:00 AM without manual intervention.
+- 🛡️ **Defensive Security Headers:** Strict CSP, HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and Referrer-Policy out of the box.
 - 🔐 **Robust Authentication:** Secure registration and login using salted `bcrypt` password hashing and signed HTTP sessions.
 - 🛡️ **Role-Based Access Control (RBAC):** Database-backed administrative role (`is_admin`) with fallback migration safeguards.
-- 📊 **Administrative Control Panel:** Full user lifecycle management featuring real-time search queries and paginated database records.
-- 📚 **Threat Knowledgebase:** Dynamic, data-driven attack library detailing attack mechanics, types, real-world CVEs, and mitigation strategies.
-- ⚡ **Automated 12:00 AM Daily Ingestion:** Background scheduler automatically queries CISA advisories and zero-day feeds every midnight without manual intervention.
-- 📬 **Interactive Support & Contact System:** Persistent contact and inquiries pipeline stored in the database.
-- 🎨 **Modern Futuristic UI/UX:** Responsive cybersecurity-themed aesthetic with cyber-glow styling, modal feedback, and flash alert notifications.
+- 📊 **Administrative Control Panel:** Full user lifecycle management featuring real-time search queries, advisory sync buttons, and paginated records.
+- 📚 **Threat Knowledgebase:** Dynamic, data-driven attack library detailing attack mechanics, real-world CVEs, and mitigation strategies.
+- 📬 **Interactive Support & Contact System:** Persistent inquiries pipeline stored in the database with administrator review tools.
+- 🎨 **Modern Cyber-Defense UI/UX:** Responsive cybersecurity-themed aesthetic with CSS design tokens (`tokens.css`), cyber-glow styling, modal feedback, and flash alert notifications.
+- 🧪 **Comprehensive Automated Test Suite:** 24 unit & integration tests covering auth, RBAC, scanner mock routines, file quarantine, and security headers.
 
 ---
 
@@ -70,46 +77,61 @@ VirusGuard leverages a clean, decoupled MVC-inspired architecture built on top o
 ```mermaid
 flowchart TD
     subgraph Client["Client Tier (Browser)"]
-        User["User / Analyst"]
-        AdminUser["Security Administrator"]
+        User["User / Security Analyst"]
+        AdminUser["SOC Administrator"]
     end
 
-    subgraph AppServer["Application Tier (Flask / WSGI)"]
+    subgraph AppServer["Application Tier (Flask / WSGI / Gunicorn)"]
         Router["Flask Routing Engine (app.py)"]
         AuthModule["Auth & Session Handler (bcrypt)"]
         ScannerModule["Scanner Gateway (virus_scanner.py)"]
         AIEngine["AI Intelligence Agent (Groq / Llama 3)"]
         AlertModule["Alert Dispatcher (alert_system.py)"]
-        FileModule["File Storage Handler (file_handler.py)"]
+        FileModule["File Storage & Quarantine (file_handler.py)"]
+        AdvisoryService["Advisory Engine (advisory_service.py)"]
+        ThreatIntel["Threat Intel Ingestion (threat_intel_service.py)"]
+        Scheduler["12:00 AM Scheduler (advisory_scheduler.py)"]
     end
 
     subgraph DataTier["Data Tier"]
-        DB[(Relational DB / MySQL / SQLite)]
-        DiskStorage[("Local Upload Quarantine (/uploads)")]
-        AttackData["Threat Dataset (attack_data.py)"]
+        DB[(Relational DB / SQLite / PostgreSQL / MySQL)]
+        DiskStorage[("Quarantine Storage (/uploads)")]
     end
 
     subgraph ExternalAPIs["External Intelligence Cloud"]
         VT["VirusTotal API v3"]
         GroqCloud["Groq Cloud (Llama 3 70B)"]
         SMTP["SMTP Mail Server"]
+        CISA["CISA Advisories & US-CERT"]
+        Feeds["BleepingComputer / THN RSS"]
     end
 
-    User -->|HTTP Requests / Uploads| Router
-    AdminUser -->|Admin Auth & Queries| Router
+    User -->|HTTP Requests / File Uploads| Router
+    AdminUser -->|Admin Auth & Manual Sync| Router
     Router --> AuthModule
     Router --> ScannerModule
-    Router --> AttackData
+    Router --> AdvisoryService
+    Router --> ThreatIntel
     AuthModule <--> DB
     Router <--> DB
 
     ScannerModule --> FileModule
     FileModule --> DiskStorage
-    ScannerModule <-->|Upload & Poll Results| VT
+    ScannerModule <-->|1. SHA-256 Hash Pre-Check| VT
+    ScannerModule <-->|2. File Upload & Poll| VT
     ScannerModule -->|Trigger on Malicious Result| AIEngine
     ScannerModule -->|Trigger on Malicious Result| AlertModule
-    AIEngine <-->|Structured Prompts| GroqCloud
+    AIEngine <-->|Structured Prompt Inferences| GroqCloud
     AlertModule -->|Dispatches Alerts| SMTP
+
+    Scheduler -.->|Runs at 12:00 AM & on Boot| AdvisoryService
+    Scheduler -.->|Runs at 12:00 AM & on Boot| ThreatIntel
+    AdvisoryService <-->|Fetch Advisories & CVEs| CISA
+    AdvisoryService <-->|Fetch Vulnerability News| Feeds
+    ThreatIntel <-->|Fetch Zero-Day IOCs| CISA
+    ThreatIntel <-->|Fetch Security Reports| Feeds
+    AdvisoryService --> DB
+    ThreatIntel --> DB
 ```
 
 ---
@@ -120,19 +142,21 @@ flowchart TD
 - **Language:** Python 3.10+
 - **Web Framework:** [Flask 3.0+](https://flask.palletsprojects.com/)
 - **ORM:** [Flask-SQLAlchemy 3.1+](https://flask-sqlalchemy.palletsprojects.com/)
-- **Database Driver:** [PyMySQL 1.1+](https://pymysql.readthedocs.io/)
+- **Database Driver:** SQLite (development / default), [psycopg2](https://www.psycopg.org/) (PostgreSQL production), [PyMySQL](https://pymysql.readthedocs.io/) (MySQL)
 - **Cryptography & Hashing:** [bcrypt 4.1+](https://pypi.org/project/bcrypt/)
 - **Configuration Management:** [python-dotenv 1.0+](https://pypi.org/project/python-dotenv/)
+- **Testing:** [pytest 8.0+](https://docs.pytest.org/)
 
 ### AI & Threat Intelligence APIs
-- **Generative AI:** [Groq Python SDK (groq 0.9+)](https://console.groq.com/) running `llama3-70b-8192`
+- **Generative AI:** [Groq Python SDK](https://console.groq.com/) running `llama3-70b-8192`
 - **Antivirus Analysis:** [VirusTotal API v3](https://developers.virustotal.com/reference/overview) via [requests 2.31+](https://requests.readthedocs.io/)
-- **Alert Dispatching:** Standard Library `smtplib` + `email.mime`
+- **Intelligence Feeds:** CISA US-CERT Bulletins, BleepingComputer, The Hacker News
+- **Alert Dispatching:** Python Standard Library `smtplib` + `email.mime`
 
 ### Frontend & Design System
 - **Templating:** Jinja2 (HTML5)
-- **Styling:** Custom CSS3 Design System (`tokens.css`, `app.css`, `space.css`)
-- **Fonts & Icons:** Google Fonts, FontAwesome
+- **Styling:** Custom Cyber Defense Design System (`tokens.css`, `app.css`)
+- **Fonts & Icons:** Inter, JetBrains Mono, FontAwesome 6
 
 ---
 
@@ -145,24 +169,28 @@ VirusGuard/
 ├── Procfile                    # Render & Heroku WSGI entry configuration
 ├── render.yaml                 # Render infrastructure-as-code blueprint specification
 ├── pytest.ini                  # Pytest configuration and path discovery
-├── README.md                   # Complete enterprise documentation and architecture guide
-├── REDESIGN_PROGRESS.md        # Architecture transition and feature tracking document
+├── README.md                   # Enterprise documentation and architecture guide
 ├── requirements.txt            # Production Python package dependencies (Flask, Gunicorn, etc.)
 │
-├── app.py                      # Core Flask application, routing, models, CSRF, and AI pipeline
-├── attack_data.py              # Centralized encyclopedia dataset for attack vectors & CVEs
+├── app.py                      # Core Flask application, routing, models, security headers & AI pipeline
 ├── virus_scanner.py            # VirusTotal API v3 multi-engine scanner & fast-path hash client
-├── alert_system.py             # Configurable SMTP security alert notification dispatcher
 ├── file_handler.py             # Secure file quarantine, SHA-256 calculation & auto-deletion
+├── alert_system.py             # Configurable SMTP security alert notification dispatcher
+├── attack_data.py              # Baseline encyclopedia dataset for 11 core attack vectors
+│
+├── advisory_service.py         # CISA & security advisory scraper, entity extractor & parser
+├── threat_intel_service.py     # Live threat intelligence ingestion, IOC extraction & vector mapper
+├── advisory_scheduler.py       # Automated 12:00 AM daily background scheduler & boot catch-up
+├── sync_advisories.py          # Standalone CLI runner for manual advisory synchronization
+├── sync_threat_intel.py        # Standalone CLI runner for manual threat intelligence synchronization
 │
 ├── tests/                      # Automated test suite (pytest)
-│   └── test_app.py             # Unit & integration tests for routes, auth, files & APIs
+│   └── test_app.py             # 24 unit & integration tests for routes, auth, files & APIs
 │
 ├── static/                     # Static media and modern design system assets
 │   ├── css/
 │   │   ├── app.css             # Main application layout, components, and responsive grid
 │   │   └── tokens.css          # Design tokens (colors, typography, spacing, glow variables)
-│   ├── space.css               # Futuristic visual effects and cosmic theme overrides
 │   ├── Attacks/                # Threat encyclopedia card and blog hero images
 │   ├── Post/                   # Security advisories and CVE vulnerability artwork
 │   ├── aboutUS/                # Company and team profile images
@@ -194,15 +222,16 @@ VirusGuard/
 
 ## 🧩 Component Breakdown
 
-| Module / Directory | Purpose & Responsibility | Key Interactions |
+| Module / Script | Purpose & Responsibility | Key Integrations |
 | :--- | :--- | :--- |
-| **`app.py`** | Central orchestrator. Initializes Flask, manages DB models (`User`, `ContactMessage`), registers all endpoints, performs session verification, and coordinates scanning. | Interacts with `virus_scanner.py`, `attack_data.py`, `file_handler.py`, `alert_system.py`, and `Groq`. |
-| **`virus_scanner.py`** | Wrapper around VirusTotal API v3. Handles direct file uploads (<32MB), dedicated large-file upload URLs (>32MB), and polling execution. | Invoked by `/upload` in `app.py`. Communicates externally with `https://www.virustotal.com/api/v3`. |
-| **`attack_data.py`** | Single source of truth for the cybersecurity encyclopedia. Contains descriptions, classifications, and mitigation guides for 11 major attack types. | Ingested by `/Attacks` (grid view) and `/attacks/<slug>` (detail view) in `app.py`. |
+| **`app.py`** | Central orchestrator. Initializes Flask, registers security headers, manages DB models (`User`, `ContactMessage`, `SecurityAdvisory`, `ThreatVector`, `ThreatIntelUpdate`), routes requests, and starts background schedulers. | Interacts with all sub-services and Groq Cloud. |
+| **`virus_scanner.py`** | Wrapper around VirusTotal API v3. Implements fast-path SHA-256 hash lookups, direct file uploads (<32MB), large-file upload endpoints (>32MB), and polling execution. | Invoked by `/upload` in `app.py`. Communicates externally with `https://www.virustotal.com/api/v3`. |
+| **`file_handler.py`** | Manages file quarantine, validates allowed file extensions, calculates SHA-256 hashes safely in chunks, and deletes quarantined files immediately post-scan. | Called by `/upload` in `app.py`. Operates strictly inside `/uploads`. |
+| **`advisory_service.py`** | Scrapes official CISA advisories and RSS news feeds, cleans HTML content, determines severity (Critical/High/Medium/Low), extracts CVE IDs, and deduplicates records against the database. | Feeds `SecurityAdvisory` records for `/Post` and `/admin`. |
+| **`threat_intel_service.py`**| Fetches real-time threat reports, extracts IOCs (hashes, IP addresses), maps updates to canonical threat vectors (`Ransomware`, `Phishing`, etc.), and persists updates to `ThreatIntelUpdate`. | Updates `/attacks` and `/attacks/<slug>`. |
+| **`advisory_scheduler.py`** | Background daemon thread. Calculates exact time until 12:00 AM midnight, triggers daily ingestion jobs, and runs a catch-up sync 5 seconds after application boot. | Started automatically on app boot inside `app.py`. |
 | **`alert_system.py`** | Automated alerting module. Formats MIME email messages and dispatches notifications via SMTP when malicious files are confirmed. | Triggered by `app.py` when `positives > 0` in scan results. |
-| **`file_handler.py`** | Manages local filesystem write operations and quarantines uploaded files inside the `/uploads` directory. | Called by `app.py` during multipart form file submissions. |
-| **`templates/`** | Server-side rendered Jinja2 templates using modular partials (`_nav.html`, `_footer.html`) and template inheritance (`base.html`). | Consumed by Flask view functions to deliver responsive web pages. |
-| **`static/css/`** | Custom CSS design system using CSS custom properties (variables), responsive flex/grid layouts, and cyberpunk dark-mode aesthetics. | Loaded by `base.html` for uniform interface styling. |
+| **`attack_data.py`** | Contains baseline content and structural profiles for 11 cyber attack vectors used to seed `ThreatVector` records. | Seeded on initial startup by `threat_intel_service.py`. |
 
 ---
 
@@ -210,9 +239,9 @@ VirusGuard/
 
 ### Prerequisites
 - **Python:** 3.10, 3.11, or 3.12
-- **MySQL Database Server:** (Optional: SQLite can be used for local testing)
 - **VirusTotal API Key:** [Obtain free from VirusTotal](https://www.virustotal.com/)
 - **Groq Cloud API Key:** [Obtain free from Groq Console](https://console.groq.com/)
+- **Database:** SQLite (built-in, zero config) or PostgreSQL / MySQL for production
 
 ### Step-by-Step Installation
 
@@ -225,17 +254,17 @@ cd VirusGuard
 #### 2. Create and Activate a Virtual Environment
 - **On Linux / macOS:**
   ```bash
-  python3 -m venv venv
-  source venv/bin/activate
+  python3 -m venv .venv
+  source .venv/bin/activate
   ```
 - **On Windows (PowerShell):**
   ```powershell
-  python -m venv venv
-  .\venv\Scripts\Activate.ps1
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
   ```
 - **On Windows (Command Prompt):**
   ```cmd
-  .\venv\Scripts\activate.bat
+  .\.venv\Scripts\activate.bat
   ```
 
 #### 3. Install Dependencies
@@ -247,40 +276,48 @@ pip install -r requirements.txt
 #### 4. Configure Environment Variables
 Copy the `.env.example` file to create your `.env` file:
 ```bash
-# On Linux / macOS:
 cp .env.example .env
-
-# On Windows:
-copy .env.example .env
 ```
-Edit `.env` with your actual API keys and database credentials (see [Environment Configuration](#-environment-configuration)).
+Edit `.env` with your actual API keys:
+- Add your `SECRET_KEY` (generate one with `python -c "import secrets; print(secrets.token_hex(32))"`)
+- Add your `VIRUSTOTAL_API_KEY`
+- Add your `GROQ_API_KEY`
 
 #### 5. Initialize the Database & Run the Server
 ```bash
 python app.py
 ```
-*The application will automatically connect to the configured database, create the required tables (`User`, `ContactMessage`), and start the development server at `http://127.0.0.1:5000/`.*
+*The application connects to the configured database, auto-creates all 5 tables (`users`, `contact_messages`, `security_advisories`, `threat_vectors`, `threat_intel_updates`), seeds the threat encyclopedia, starts the 12:00 AM background scheduler, and launches the server at `http://127.0.0.1:5001/`.*
 
 ---
 
 ## 🔐 Environment Configuration
 
-All environment variables must be defined in the `.env` file located in the root directory:
+All environment variables can be configured in your `.env` file:
 
 | Variable | Required | Default Value | Description |
 | :--- | :---: | :--- | :--- |
-| `SECRET_KEY` | **Yes** | *None* | Cryptographic key used by Flask to sign session cookies. Generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `SECRET_KEY` | **Yes** | *None* | Cryptographic key used by Flask to sign session cookies. |
+| `FLASK_ENV` | No | `development` | Environment mode (`development` or `production`). Enables HTTPS secure cookie flags in production. |
+| `PORT` | No | `5001` | Server listening port (defaults to 5001 to avoid macOS AirPlay conflict on 5000). |
+| `VIRUSTOTAL_API_KEY` | **Yes** | *None* | API key for VirusTotal v3 multi-engine file analysis and hash lookup. |
 | `GROQ_API_KEY` | **Yes** | *None* | API key for Groq Cloud to execute Llama 3 70B inferences. |
-| `VIRUSTOTAL_API_KEY` | **Yes** | *None* | API key for VirusTotal v3 multi-engine file analysis. |
-| `DATABASE_URL` | No | `mysql+pymysql://root:root@localhost/virus_users` | SQLAlchemy connection string. Can use SQLite via `sqlite:///virusguard.db`. |
-| `ADMIN_EMAIL` | No | `Admin@gmail.com` | Fallback administrative email address for bootstrapping admin accounts. |
-| `ADMIN_PASSWORD` | No | `admin` | Fallback bootstrap password for initial administrator provisioning. |
+| `DATABASE_URL` | No | `sqlite:///virus_users.db` | SQLAlchemy connection string (`sqlite:///...`, `postgresql://...`, or `mysql+pymysql://...`). |
+| `ADMIN_EMAIL` | No | `Admin@gmail.com` | Email address for initial bootstrap administrator provisioning. |
+| `ADMIN_PASSWORD` | No | `admin` | Password for initial bootstrap administrator provisioning. |
+| `CRON_SECRET` | No | *None* | Secret token protecting POST `/api/sync-threat-intel` and `/api/sync-advisories` webhooks. |
+| `SMTP_SERVER` | No | `smtp.gmail.com` | SMTP host for dispatching malware detection emails. |
+| `SMTP_PORT` | No | `587` | SMTP port (587 for STARTTLS). |
+| `SMTP_USE_TLS` | No | `true` | Enables TLS for SMTP communication. |
+| `SMTP_USER` | No | *None* | SMTP username or sender email address. |
+| `SMTP_PASSWORD` | No | *None* | SMTP app password or credential. |
+| `ALERT_RECIPIENT_EMAIL` | No | *None* | Security operations email address to receive threat alerts. |
 
 ---
 
 ## 🗄️ Database Schema & Models
 
-VirusGuard uses **Flask-SQLAlchemy** with an automatic table creation workflow on application startup (`db.create_all()`).
+VirusGuard uses **Flask-SQLAlchemy** with automatic table creation and baseline seeding on application startup (`db.create_all()`).
 
 ```mermaid
 erDiagram
@@ -290,6 +327,7 @@ erDiagram
         string email "UNIQUE, NOT NULL"
         string password "NOT NULL (bcrypt hash)"
         boolean is_admin "DEFAULT FALSE"
+        datetime created_at
     }
 
     CONTACT_MESSAGE {
@@ -298,28 +336,56 @@ erDiagram
         string email "NOT NULL"
         string subject "NOT NULL"
         text message "NOT NULL"
-        datetime created_at "DEFAULT CURRENT_TIMESTAMP"
+        datetime created_at
     }
+
+    SECURITY_ADVISORY {
+        int id PK
+        string title "NOT NULL"
+        string cve_id "NULLABLE"
+        string severity "CRITICAL | HIGH | MEDIUM | LOW"
+        string source "DEFAULT Security Bulletin"
+        string author "DEFAULT Threat Intelligence Desk"
+        text summary "NOT NULL"
+        string external_url "UNIQUE, NOT NULL"
+        datetime published_date
+        datetime created_at
+    }
+
+    THREAT_VECTOR {
+        int id PK
+        string slug "UNIQUE, NOT NULL, INDEX"
+        string title "NOT NULL"
+        string category
+        string card_img
+        string hero_img
+        text desc
+        string long_title
+        text intro
+        text sections_json
+        string external_link
+        string source_name
+        datetime last_updated
+        boolean is_emerging
+    }
+
+    THREAT_INTEL_UPDATE {
+        int id PK
+        string vector_slug FK "REFERENCES threat_vectors.slug"
+        string title "NOT NULL"
+        string update_type "DEFAULT Malware Analysis"
+        text summary "NOT NULL"
+        text technical_details
+        text iocs
+        string cve_id
+        string source_name
+        string source_url "UNIQUE, NOT NULL"
+        datetime published_date
+        datetime created_at
+    }
+
+    THREAT_VECTOR ||--o{ THREAT_INTEL_UPDATE : "contains updates"
 ```
-
-### Model Definitions (`app.py`)
-
-#### `User` Model
-Represents registered platform members and administrators.
-- `id` (`Integer`, Primary Key): Unique identifier.
-- `name` (`String(100)`, Not Null): Full name or display username.
-- `email` (`String(100)`, Unique, Not Null): User login email.
-- `password` (`String(100)`, Not Null): Salted `bcrypt` password hash string.
-- `is_admin` (`Boolean`, Default `False`): Role-based access control flag.
-
-#### `ContactMessage` Model
-Stores inquiries and feedback submitted via the Contact Us portal.
-- `id` (`Integer`, Primary Key): Message identifier.
-- `name` (`String(100)`, Not Null): Sender's name.
-- `email` (`String(100)`, Not Null): Sender's email.
-- `subject` (`String(200)`, Not Null): Inquiry topic.
-- `message` (`Text`, Not Null): Full message body.
-- `created_at` (`DateTime`): Timestamp generated automatically by the database server.
 
 ---
 
@@ -360,6 +426,8 @@ sequenceDiagram
 
 ## 🔬 Malware Scanning & AI Pipeline
 
+VirusGuard utilizes a smart two-stage analysis pipeline to maximize speed and minimize external API quota consumption:
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -371,24 +439,61 @@ sequenceDiagram
     participant Alert as SMTP Alert System
 
     User->>Router: POST /upload (multipart/form-data)
-    Router->>Disk: Save file to /uploads via file_handler.py
-    Router->>VT: POST /files (Upload file payload)
-    VT-->>Router: Return analysis_id
-    loop Poll Scan Status
-        Router->>VT: GET /analyses/{analysis_id}
-        VT-->>Router: Status ('queued', 'in_progress', or 'completed')
+    Router->>Disk: Save file to quarantine & calculate SHA-256
+    Router->>VT: 1. Fast-Path: GET /files/{sha256}
+    alt Hash Known in VirusTotal Database
+        VT-->>Router: Immediate scan statistics & engine verdicts
+    else Hash Not Found
+        Router->>VT: 2. Upload file payload: POST /files
+        VT-->>Router: analysis_id
+        loop Poll Status
+            Router->>VT: GET /analyses/{analysis_id}
+            VT-->>Router: queued / in_progress / completed
+        end
     end
+    Router->>Disk: Safe file cleanup (file_handler.delete_file)
     alt Malicious Verdict (positives > 0)
         Router->>AI: Trigger explain_virus_info(virus_info)
         Note over Router,AI: 4 Parallel Queries: Identity, History, Mechanics, Prevention
-        AI-->>Router: 4-part AI Explanation Output
+        AI-->>Router: Structured 4-part AI intelligence briefing
         Router->>Alert: send_alert(file_path, virus_info)
-        Alert->>Alert: Send notification email via SMTP
+        Alert->>Alert: Send SOC alert email via SMTP
         Router-->>User: Render scan.html with Threat Badges & AI Accordion
     else Clean Verdict (positives == 0)
         Router-->>User: Render scan.html with Clean File Status
     end
 ```
+
+---
+
+## 🕒 Automated Threat Intelligence Engine
+
+VirusGuard features an automated threat intelligence and vulnerability advisory engine that updates every day at **12:00 AM (Midnight)** without requiring manual intervention:
+
+### 1. Ingestion Feeds & Correlation
+- **CISA Cybersecurity Advisories (Official US-CERT Alerts & Bulletins)**
+- **BleepingComputer Cybersecurity Research Feed**
+- **The Hacker News Threat Intelligence & Zero-Day Feed**
+- **Automated Entity Extraction:** Extracts CVE IDs (`CVE-YYYY-NNNNN`) and Indicators of Compromise (IOCs: SHA-256/MD5 hashes, malicious IP addresses).
+- **Categorization & Mapping:** Classifies intelligence into canonical threat vectors (`Ransomware`, `SQL_Injection`, `Trojan_horse`, `Command_Execution`, `Phishing`, etc.) and automatically updates vector `last_updated` timestamps.
+- **Strict Deduplication:** Guaranteed uniqueness enforced at the database level via canonical `source_url` and `external_url` unique constraints.
+
+### 2. Multi-Tier Reliability Architecture
+Because serverless and free-tier web hosts (e.g., Render Free Tier) spin down after periods of inactivity, VirusGuard employs a robust three-tier execution strategy:
+1. **Background Daemon Scheduler (`advisory_scheduler.py`):** Runs while the service is active, computes seconds until 12:00 AM local time, sleeps until midnight, and executes synchronization routines.
+2. **Boot Catch-up Sync:** Whenever the app spins up or restarts (e.g. on visitor wake-up), a background thread checks catalog freshness and ingests any missed updates 5 seconds post-boot without blocking the HTTP server.
+3. **External Cron / Webhook Integration:** You can ping authenticated endpoints from an external cron service (such as [cron-job.org](https://cron-job.org/) or GitHub Actions):
+   - `POST https://your-app.onrender.com/api/sync-threat-intel`
+   - `POST https://your-app.onrender.com/api/sync-advisories`
+   *(Protected with `Authorization: Bearer <CRON_SECRET>`)*
+
+### 3. CLI & Manual Triggers
+- **CLI Ingestion Scripts:**
+  ```bash
+  python sync_threat_intel.py   # Ingest latest threat vectors and IOCs
+  python sync_advisories.py     # Ingest latest CVE security advisories
+  ```
+- **Admin Dashboard Trigger:** Authenticated administrators can click the **Sync Threat Intel Now** or **Sync Advisories Now** buttons in the `/admin` portal for instant on-demand synchronization.
 
 ---
 
@@ -398,39 +503,46 @@ sequenceDiagram
 
 | Endpoint | HTTP Method | Auth Required | Description |
 | :--- | :---: | :---: | :--- |
-| `/` | `GET` | No | Renders the primary landing view (`landing.html`). |
+| `/` | `GET` | No | Primary landing view (`landing.html`). |
 | `/Home` | `GET` | No | Permanent redirect to `/`. |
+| `/health`, `/healthz` | `GET` | No | Service health check and uptime probe (returns JSON status). |
 | `/Register` | `GET`, `POST` | No | User registration. Hashes password via `bcrypt` and auto-authenticates user. |
 | `/login` | `GET`, `POST` | No | User/Admin authentication with role-based routing. |
 | `/logout` | `GET` | Yes | Terminates session and redirects to `/login`. |
 | `/scan` | `GET` | **User** | Protected dashboard for uploading and scanning files (`scan.html`). |
 | `/upload` | `POST` | **User** | Receives file upload, triggers VirusTotal analysis, AI explanation, and email alerts. |
-| `/Attacks` | `GET` | No | Renders the attack vector catalog (`attacks.html`). |
-| `/attacks/<slug>` | `GET` | No | Renders deep-dive guide for a specific attack type (`attack_detail.html`). |
-| `/<legacy_slug>` | `GET` | No | Backwards-compatibility redirects for legacy attack paths (e.g. `/SQL_Injection`). |
+| `/Attacks` | `GET` | No | Renders threat intelligence catalog grid (`attacks.html`). |
+| `/attacks/<slug>` | `GET` | No | Renders deep-dive guide and live IOCs for a specific attack type (`attack_detail.html`). |
+| `/Post` | `GET` | No | Security advisories, trending threat alerts, and CVE bulletins with search and severity filters. |
 | `/admin` | `GET` | **Admin** | Protected management console with search (`?q=`) and pagination (`?page=`). |
+| `/admin/sync_threat_intel` | `POST` | **Admin** | Web-based trigger to synchronize threat intelligence feeds immediately. |
+| `/admin/sync_advisories` | `POST` | **Admin** | Web-based trigger to synchronize CISA/NVD advisories immediately. |
+| `/api/sync-threat-intel` | `POST` | **Token / Cron** | Authenticated webhook to trigger threat intelligence sync via `CRON_SECRET`. |
+| `/api/sync-advisories` | `POST` | **Token / Cron** | Authenticated webhook to trigger advisory sync via `CRON_SECRET`. |
 | `/delete_user/<id>` | `POST` | **Admin** | Deletes a user account by primary key ID. |
-| `/ContactUs` | `GET`, `POST` | No | Renders contact form and stores messages in `ContactMessage` table. |
-| `/Post` | `GET` | No | Security advisories, trending threat alerts, and CVE bulletins. |
+| `/delete_message/<id>` | `POST` | **Admin** | Deletes a contact message by primary key ID. |
+| `/ContactUs` | `GET`, `POST` | No | Renders contact form and stores messages in `contact_messages` table. |
 | `/Missions` | `GET` | No | Platform mission statement, security standards, and operational guidelines. |
 | `/about` | `GET` | No | About the engineering team, architecture, and threat research methodology. |
 | `/Help` | `GET` | No | Documentation, FAQs, and user assistance portal. |
 
 ---
 
-## 🛡️ Admin Dashboard
+## 🛡️ Admin & SOC Dashboard
 
-Accessible at `/admin` for users with `is_admin == True` or authenticated via administrator credentials:
+Accessible at `/admin` for users with `is_admin == True`:
 
-- **User Search:** Real-time case-insensitive search by user name or email address (`db.or_(User.name.ilike(...), User.email.ilike(...))`).
-- **Pagination Engine:** Uses SQLAlchemy's native `paginate(page=page, per_page=10)` to efficiently manage high volumes of records.
-- **Account Removal:** Instant, secure POST-based deletion (`/delete_user/<user_id>`) with automatic session validation.
+- **Threat Sync Controls:** One-click on-demand ingestion buttons for both Security Advisories and Threat Intelligence.
+- **Metric Cards:** Real-time counters for registered users, active advisories, and tracked threat IOCs.
+- **User Management & Search:** Case-insensitive search across user names and email addresses with pagination.
+- **Message Center:** Inquiries submitted via Contact Us with one-click message deletion.
+- **Protected Actions:** All destructive actions (`/delete_user`, `/delete_message`) enforce POST methods and session authorization.
 
 ---
 
 ## 📖 Threat Intelligence Encyclopedia
 
-VirusGuard includes built-in guides covering 11 critical cyber threat categories:
+VirusGuard includes dynamic, database-backed intelligence covering 11 critical cyber threat categories:
 
 1. **SQL Injection (SQLi):** Classic, Blind, Time-Based, and Out-of-Band query manipulation techniques.
 2. **Cross-Site Scripting (XSS):** Stored, Reflected, and DOM-based client execution vulnerabilities.
@@ -444,16 +556,23 @@ VirusGuard includes built-in guides covering 11 critical cyber threat categories
 10. **Rootkits:** User Mode, Kernel Mode, Bootkits, Firmware Rootkits, and Virtual Machine Rootkits.
 11. **Ransomware & Cryptojacking:** Asymmetric file encryption operations, Bitcoin/Monero resource hijacking, and mitigation protocols.
 
+Each category includes real-world CVE references, MITRE ATT&CK mappings, historical campaigns, and live Indicators of Compromise updated from active threat feeds.
+
 ---
 
 ## 🔒 Security Implementations
 
-- 🔑 **Cryptographic Session Integrity:** Session cookies signed using a high-entropy `SECRET_KEY`.
-- 🛡️ **Salted Password Hashing:** Cryptographic password storage using `bcrypt.hashpw()` with random salt generation (`bcrypt.gensalt()`).
-- 🛑 **Strict Environment Isolation:** Zero hardcoded API keys or database passwords in source code; enforced runtime checks halt startup if secrets are missing.
-- 📁 **File Quarantine & Storage Control:** Uploaded binaries staged inside dedicated quarantine storage with unique name preservation.
+- 🔑 **Cryptographic Session Integrity:** Session cookies signed using a high-entropy `SECRET_KEY` with `HttpOnly` and `SameSite=Lax` flags (`Secure` enforced in production).
+- 🛡️ **Salted Password Hashing:** Cryptographic password storage using `bcrypt.hashpw()` with random salt generation.
+- 🛑 **Defensive Security Headers:** Every HTTP response includes:
+  - `Content-Security-Policy`: Restricts script and style origins.
+  - `X-Content-Type-Options: nosniff`: Prevents MIME-sniffing attacks.
+  - `X-Frame-Options: SAMEORIGIN`: Protects against clickjacking.
+  - `Strict-Transport-Security`: Enforces HTTPS in production.
+  - `Referrer-Policy: strict-origin-when-cross-origin`: Minimizes referrer leakage.
+- 📁 **File Quarantine & Auto-Cleanup:** Uploaded binaries staged inside dedicated quarantine storage, scanned, and immediately deleted via `file_handler.delete_file()`.
 - 🚫 **SQL Injection Protection:** Complete reliance on SQLAlchemy parameterized queries, mitigating SQL injection across all authentication and contact inputs.
-- 🚦 **RBAC Protected Route Guards:** Route-level session inspections protecting `/scan`, `/upload`, `/admin`, and `/delete_user` endpoints.
+- 🚦 **RBAC Protected Route Guards:** Route-level session inspections protecting `/scan`, `/upload`, `/admin`, `/delete_user`, and sync endpoints.
 
 ---
 
@@ -463,21 +582,27 @@ VirusGuard includes a comprehensive automated test suite powered by `pytest` and
 
 ```bash
 # Run the complete test suite
-pytest -v
+.venv/bin/pytest
 
-# Run with coverage summary
-pytest --tb=short
+# Run with verbose output and coverage
+.venv/bin/pytest -v
 ```
 
-Mocked testing ensures that external APIs are not queried during CI/CD runs and no API quotas are consumed.
+### Test Coverage Highlights (24 Tests Passing)
+- **Authentication**: Registration with valid/invalid data, duplicate email rejection, bcrypt verification, logout session clearing.
+- **Role-Based Access Control**: Non-admin rejection from `/admin`, authorized admin access, user deletion safety.
+- **Security Headers**: Verification of CSP, X-Frame-Options, X-Content-Type-Options on all responses.
+- **File Handling**: Allowed extension checks, SHA-256 chunked calculation, quarantine creation, safe deletion.
+- **Scanner Gateway**: Fast-path hash lookup mocking, file upload polling, zero-positive clean verdicts, multi-engine malicious verdicts.
+- **Threat Intelligence & Advisories**: Ingestion pipelines, deduplication, vector mapping, and webhook authentication via `CRON_SECRET`.
 
 ---
 
 ## 🚢 Production Deployment Guide
 
-### Option A: Render Free Tier (Recommended Cloud Deployment)
+### Option A: Render Cloud Deployment (Recommended)
 
-VirusGuard is fully optimized for **Render Free Tier** web services:
+VirusGuard is fully optimized for **Render**:
 - Lightweight resource footprint (< 512MB RAM)
 - Fast-path SHA-256 hash lookups preventing long worker hangs
 - Gunicorn WSGI server with multi-threaded workers (`--workers=2 --threads=4 --timeout=60`)
@@ -502,53 +627,18 @@ git push origin main
 #### 3. Configure Environment Variables in Render
 In the **Environment** tab of your Render service, configure:
 
-| Variable | Recommended Value / Description |
+| Variable | Value / Description |
 | :--- | :--- |
 | `PYTHON_VERSION` | `3.11.9` |
 | `FLASK_ENV` | `production` |
 | `RENDER` | `true` |
-| `SECRET_KEY` | Click **Generate** (or enter a 32-byte hex string) |
+| `SECRET_KEY` | High-entropy random 32-byte hex string |
 | `DATABASE_URL` | Render PostgreSQL URL (`postgresql://...`) or default SQLite |
 | `VIRUSTOTAL_API_KEY` | Your VirusTotal v3 API Key |
 | `GROQ_API_KEY` | Your Groq Cloud API Key (`gsk_...`) |
 | `ADMIN_EMAIL` | `Admin@gmail.com` (or your preferred admin email) |
 | `ADMIN_PASSWORD` | Strong password for initial admin bootstrapping |
-
-#### 4. Ephemeral Filesystem & Database Note for Render Free Tier
-> [!IMPORTANT]
-> - **Database Persistence:** On Render Free Tier, the local disk is ephemeral and resets during spin-downs. For persistent user accounts, threat intelligence updates, and advisories in production, create a free **Render PostgreSQL database** (or Neon / Supabase PostgreSQL) and paste its connection string into `DATABASE_URL`.
-> - **Ephemeral Quarantine:** Quarantined samples in `uploads/` are deleted immediately after scanning via `file_handler.delete_file()`, ensuring zero disk bloat on Render.
-
----
-
-### 🕒 Automated 12:00 AM Threat Intelligence & Advisories Engine
-
-VirusGuard features a fully automated threat intelligence and vulnerability advisory engine that updates every day at **12:00 AM (Midnight)** without requiring manual intervention:
-
-#### 1. Ingestion Feeds & Correlation
-- **CISA Cybersecurity Advisories (Official US-CERT alerts & bulletins)**
-- **BleepingComputer Cybersecurity Research Feed**
-- **The Hacker News Threat Intelligence & Zero-Day Feed**
-- **Automated Entity Extraction:** Automatically extracts CVE IDs (`CVE-YYYY-NNNNN`) and Indicators of Compromise (IOCs: SHA-256/MD5 hashes, malicious IP addresses).
-- **Categorization & Mapping:** Classifies intelligence into canonical threat vectors (`Ransomware`, `SQL_Injection`, `Trojan_horse`, `Command_Execution`, `Phishing`, etc.) and automatically updates vector `last_updated` timestamps.
-- **Strict Deduplication:** Guaranteed uniqueness enforced at the database level via canonical `source_url` index.
-
-#### 2. Render Free Tier Architecture (Three-Tier Reliability)
-Because Render Free Tier web services spin down after 15 minutes of inactivity, VirusGuard employs a robust three-tier execution strategy:
-1. **Background Daemon Scheduler (`advisory_scheduler.py`):** Runs when the service is active, computes seconds until 12:00 AM UTC/Local, sleeps until midnight, and executes both `sync_latest_advisories()` and `sync_threat_intelligence()`.
-2. **Boot Catch-up Sync:** Whenever the app spins up or restarts (e.g. on visitor wake-up), a background thread checks catalog freshness and ingests any missed updates 5 seconds post-boot without blocking the HTTP server.
-3. **External Cron / Webhook Integration:** You can ping authenticated endpoints from an external cron service (such as [cron-job.org](https://cron-job.org/) or Render Cron):
-   - `POST https://your-app.onrender.com/api/sync-threat-intel`
-   - `POST https://your-app.onrender.com/api/sync-advisories`
-   *(Optional: protect with `CRON_SECRET` header `Authorization: Bearer <CRON_SECRET>`)*
-
-#### 3. CLI & Manual Triggers
-- **CLI Ingestion Scripts:**
-  ```bash
-  python sync_threat_intel.py   # Ingest latest threat vectors and IOCs
-  python sync_advisories.py     # Ingest latest CVE security advisories
-  ```
-- **Admin Dashboard Trigger:** Authenticated administrators can click the **Sync Threat Intel Now** or **Sync Advisories Now** buttons in the `/admin` portal for instant on-demand synchronization.
+| `CRON_SECRET` | Random token to secure `/api/sync-*` endpoints |
 
 ---
 
@@ -607,25 +697,28 @@ server {
 - **Cause:** Attempting to scan a file without setting a VirusTotal key.
 - **Solution:** Register at [VirusTotal](https://www.virustotal.com/), obtain an API key, and set `VIRUSTOTAL_API_KEY=your_key` in `.env`.
 
-#### 3. Database Connection Failure (`OperationalError: (2003, "Can't connect to MySQL server")`)
-- **Cause:** MySQL service is not running or credentials in `DATABASE_URL` are incorrect.
-- **Solution:** Verify MySQL service status, or switch to SQLite for local development:
+#### 3. Database Connection Failure
+- **Cause:** MySQL/PostgreSQL service is not running or credentials in `DATABASE_URL` are incorrect.
+- **Solution:** Switch to SQLite for local development:
   ```env
-  DATABASE_URL=sqlite:///virusguard.db
+  DATABASE_URL=sqlite:///virus_users.db
   ```
 
-#### 4. Groq API Quota / Timeout
-- **Cause:** Rate limits on Groq free tier or invalid key.
-- **Solution:** Verify API key validity on the [Groq Console](https://console.groq.com/) and check available quota.
+#### 4. Port 5000 Conflict on macOS
+- **Cause:** macOS uses port 5000 for the AirPlay Receiver.
+- **Solution:** VirusGuard defaults to port `5001` in `app.py`. If you need to override it, set `PORT=5001` in `.env`.
 
 ---
 
 ## 🗺️ Roadmap
 
+- [x] Fast-path SHA-256 hash lookup before file upload.
+- [x] Automated midnight CISA & threat intelligence synchronization.
+- [x] Security headers middleware (CSP, HSTS, X-Frame-Options).
+- [x] Automated pytest test suite (24 tests).
 - [ ] **Async Scan Tasks:** Integrate Celery and Redis to handle VirusTotal polling asynchronously without holding HTTP worker connections.
 - [ ] **Heuristic Static Analysis Engine:** Local YARA rule matching and PE header inspection for instant offline triage.
 - [ ] **Advanced SOC Dashboard:** Real-time threat visualizer, malware family clustering charts, and CSV report export.
-- [ ] **REST API with JWT:** External developer API with Bearer token authentication and webhook event callbacks.
 - [ ] **Multi-Factor Authentication (MFA):** TOTP-based 2FA support for administrative accounts.
 
 ---
@@ -668,6 +761,6 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
   - **Email:** [vishwakarma.harsh.office@gmail.com](mailto:vishwakarma.harsh.office@gmail.com)
   - **Certifications:** Google Cybersecurity Professional Certificate, Cisco Ethical Hacker Certification, Top 100 TCS HackQuest Season 9
 - **VirusTotal** for the multi-engine analysis API v3.
-- **Groq & Meta AI** for ultra-fast Llama & open-weights threat intelligence inference.
+- **Groq & Meta AI** for ultra-fast Llama 3 threat intelligence inference.
 - **CISA, BleepingComputer & The Hacker News** for authoritative threat intelligence feeds.
 - **Flask & SQLAlchemy Communities** for open-source frameworks.
